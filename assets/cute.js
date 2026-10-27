@@ -193,19 +193,59 @@
     return msg;
   }
 
-  // Nghe sự kiện TikTok thật qua WebSocket của TikFinity (thử nghiệm)
-  function tiktok(url, fn) {
-    if (!url) return;
-    let delay = 2000;
+  /* Sự kiện TikTok thật qua Event API của TikFinity (ws://127.0.0.1:21213).
+     Gói tin dạng {event, data}; tên người có thể ở data hoặc data.user;
+     quà combo (giftType 1) gửi nhiều lần, chỉ lần có repeatEnd mới là cuối. */
+  function normalizeEvent(m) {
+    if (!m || typeof m !== 'object') return null;
+    let type = String(m.event || m.type || (m.data && (m.data.event || m.data.type)) || '').toLowerCase();
+    const d = (m.data && typeof m.data === 'object') ? m.data : m;
+    const u = (d.user && typeof d.user === 'object') ? d.user : {};
+    const user = String(d.nickname || u.nickname || d.uniqueId || u.uniqueId || 'Ai đó');
+    if (type === 'social') {
+      const dt = String(d.displayType || d.label || '');
+      type = /follow/i.test(dt) ? 'follow' : /share/i.test(dt) ? 'share' : '';
+    }
+    if (type === 'follow') return { type: 'follow', user };
+    if (type === 'share') return { type: 'share', user };
+    if (type === 'subscribe') return { type: 'sub', user };
+    if (type === 'gift') {
+      const g = (d.giftDetails && typeof d.giftDetails === 'object') ? d.giftDetails : (d.gift && typeof d.gift === 'object') ? d.gift : {};
+      const giftType = Number(d.giftType != null ? d.giftType : g.giftType) || 0;
+      const end = d.repeatEnd === true || d.repeatEnd === 'true' || d.repeatEnd === 1;
+      if (giftType === 1 && !end) return null;
+      return { type: 'gift', user, gift: String(d.giftName || g.giftName || 'quà'), count: Math.max(1, parseInt(d.repeatCount, 10) || 1) };
+    }
+    return null;
+  }
+
+  // Một kết nối dùng chung cho cả trang; tự nối lại khi TikFinity mở lên sau
+  const tk = { ws: null, url: '', timer: null, delay: 1500, subs: [], stat: [] };
+  function tiktokConnect(url) {
+    url = url || '';
+    if (url === tk.url) return;
+    tk.url = url;
+    clearTimeout(tk.timer);
+    if (tk.ws) { tk.ws.onclose = null; try { tk.ws.close(); } catch (e) { /* bỏ qua */ } tk.ws = null; }
+    if (!url) { tk.stat.forEach(f => f(false)); return; }
+    const retry = () => { if (tk.url !== url) return; tk.timer = setTimeout(open, tk.delay); tk.delay = Math.min(tk.delay * 2, 10000); };
     const open = () => {
       let ws;
-      try { ws = new WebSocket(url); } catch (e) { return; }
-      ws.onopen = () => { delay = 2000; };
-      ws.onmessage = e => { try { const m = JSON.parse(e.data); if (m && m.event) fn(m.event, m.data || {}); } catch (err) { /* bỏ qua */ } };
-      ws.onclose = () => { setTimeout(open, delay); delay = Math.min(delay * 2, 30000); };
+      try { ws = new WebSocket(url); } catch (e) { retry(); return; }
+      tk.ws = ws;
+      ws.onopen = () => { tk.delay = 1500; tk.stat.forEach(f => f(true)); };
+      ws.onmessage = e => {
+        let m;
+        try { m = JSON.parse(e.data); } catch (err) { return; }
+        const ev = normalizeEvent(m);
+        if (ev) tk.subs.forEach(f => f(ev));
+      };
+      ws.onclose = () => { tk.stat.forEach(f => f(false)); retry(); };
     };
     open();
   }
+  const onTiktok = fn => tk.subs.push(fn);
+  const onTiktokStatus = fn => tk.stat.push(fn);
 
   function init(onChange) {
     const state = { cfg: readCfg(), theme: null };
@@ -213,6 +253,7 @@
       state.theme = applyTheme(state.cfg);
       bind(state.cfg, state.theme);
       fit();
+      tiktokConnect(state.cfg.ws);
       if (onChange) onChange(state.cfg, state.theme);
     };
     apply();
@@ -222,5 +263,5 @@
     return state;
   }
 
-  window.CL = { THEMES, DEFAULTS, LOGO, VALO, VALO_AGENTS, DD, q: Q, charArt, artHTML, loadLolVer, lolVer: () => lolVer, gameBadge, esc, digits, segs, readCfg, applyTheme, fit, rotator, tickerList, fmt, targetTime, listen, send, tiktok, init, pick };
+  window.CL = { THEMES, DEFAULTS, LOGO, VALO, VALO_AGENTS, DD, q: Q, charArt, artHTML, loadLolVer, lolVer: () => lolVer, gameBadge, esc, digits, segs, readCfg, applyTheme, fit, rotator, tickerList, fmt, targetTime, listen, send, normalizeEvent, tiktokConnect, onTiktok, onTiktokStatus, init, pick };
 })();

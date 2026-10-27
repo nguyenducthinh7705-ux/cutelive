@@ -160,7 +160,8 @@
       <h2>Màu và âm thanh</h2>
       <div class="colorrow"><input type="color" id="color"><span style="flex:1;font-size:14px">Màu chính</span><button class="btn soft" id="colorReset"><span>Theo game</span></button></div>
       <label class="chk"><input type="checkbox" id="sound"> Âm thanh khi có alert</label>
-      <label class="chk"><input type="checkbox" id="ws"> Nhận follow và quà thật từ TikFinity (thử nghiệm)</label>
+      <label class="chk"><input type="checkbox" id="ws"> Nhận follow và quà thật từ TikFinity</label>
+      <p class="hint" id="wsStatus" hidden></p>
     </section>
   </aside>
 
@@ -340,8 +341,20 @@
     };
   });
 
+  // Trạng thái kết nối TikFinity, hiện ngay dưới ô tick
+  CL.onTiktokStatus(ok => {
+    const el = $('#wsStatus');
+    el.hidden = !cfg.ws;
+    el.style.color = ok ? 'var(--p)' : '';
+    el.textContent = ok
+      ? 'Đã kết nối TikFinity. Follow và quà thật sẽ tự hiện alert.'
+      : 'Chưa thấy TikFinity. Mở app TikFinity trên máy này, kết nối live, và bật Event API (cổng 21213).';
+  });
+
   let sendTimer = null;
   function changed() {
+    CL.tiktokConnect(cfg.ws);
+    if (!cfg.ws) $('#wsStatus').hidden = true;
     try { localStorage.setItem('cuteLive.cfg', JSON.stringify(cfg)); } catch (e) { /* bỏ qua */ }
     const t = CL.applyTheme(cfg);
     $('#color').value = cfg.color || t.p;

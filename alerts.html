@@ -101,16 +101,7 @@
     setTimeout(demo, 600);
     setInterval(demo, 5600);
   }
-  CL.tiktok(st.cfg.ws, (event, d) => {
-    const user = d.nickname || d.uniqueId || 'Ai đó';
-    if (event === 'follow') push({ type: 'follow', user });
-    else if (event === 'share') push({ type: 'share', user });
-    else if (event === 'subscribe') push({ type: 'sub', user });
-    else if (event === 'gift') {
-      if (d.giftType === 1 && !d.repeatEnd) return; // chờ hết combo mới báo
-      push({ type: 'gift', user, gift: d.giftName, count: d.repeatCount || 1 });
-    }
-  });
+  CL.onTiktok(push);
 </script>
 </body>
 </html>

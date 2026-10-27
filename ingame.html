@@ -138,7 +138,7 @@
 
   CL.listen(msg => { if (msg.kind === 'guides') document.body.classList.toggle('show-guides', !!msg.on); });
   // Follow thật từ TikFinity → tự cộng vào thanh mục tiêu
-  CL.tiktok(st.cfg.ws, ev => { if (ev === 'follow') { bonus++; renderGoal(st.cfg); } });
+  CL.onTiktok(ev => { if (ev.type === 'follow') { bonus++; renderGoal(st.cfg); } });
 </script>
 </body>
 </html>
