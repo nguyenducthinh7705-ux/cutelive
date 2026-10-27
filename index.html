@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cute Live Kit</title>
+<link rel="stylesheet" href="assets/cute.css">
+<style>
+  /* Bảng điều khiển dùng cùng ngôn ngữ HUD: khối góc vuông, sọc màu, nút nghiêng. */
+  html, body { height: auto !important; min-height: 100%; overflow: auto !important; }
+  body.hub { background: var(--bone); font-size: 15px; }
+  .hub-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; max-width: 1520px; margin: 0 auto; padding: 28px 28px 20px; border-bottom: 2px solid var(--line); }
+  .brand { display: flex; align-items: center; gap: 16px; }
+  .brand img { width: 64px; height: 64px; }
+  .brand h1 { margin: 0; font: 800 46px/1 var(--fd); }
+  .brand p { margin: 4px 0 0; color: var(--mute); }
+  .hub-main { display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 28px; align-items: start; max-width: 1520px; margin: 0 auto; padding: 24px 28px 56px; }
+  .side { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 12px; max-height: calc(100vh - 32px); overflow: auto; padding-right: 6px; }
+  .sec { position: relative; background: #fff; padding: 18px 18px 18px; border-top: 4px solid var(--p); }
+  .sec h2 { margin: 0 0 10px; font: 800 26px/1 var(--fd); }
+  .f { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; font-size: 13px; font-weight: 600; color: var(--mute); }
+  .f output { font-weight: 500; }
+  .f input:not([type=range]):not([type=color]), .f select, .f textarea {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 0; outline: none;
+    background: var(--bone); color: var(--ink); font: 500 15px var(--fb);
+  }
+  .f textarea { min-height: 96px; resize: vertical; }
+  .f input:focus, .f select:focus, .f textarea:focus { border-color: var(--p); box-shadow: inset 0 -3px 0 var(--p); }
+  .f input[type=range] { accent-color: var(--p); }
+  .hint { margin: 8px 0 0; font-size: 12px; color: var(--mute); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .games { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .gtile { position: relative; display: grid; place-items: center; height: 62px; padding: 10px 14px; border: 1px solid var(--line); background: #fff; cursor: pointer; }
+  .gtile img { max-width: 100%; max-height: 32px; }
+  .gtile .gt { font: 800 20px/1 var(--fd); color: var(--ink); }
+  .gtile.on { border-color: var(--ink); box-shadow: inset 0 -5px 0 var(--c); }
+  .chars { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; max-height: 260px; overflow: auto; margin-top: 10px; }
+  .ctile { display: block; aspect-ratio: 1; padding: 0; border: 2px solid transparent; background: var(--p2); cursor: pointer; overflow: hidden; }
+  .ctile img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .ctile.on { border-color: var(--ink); box-shadow: inset 0 0 0 2px var(--p); }
+  .ctile:focus-visible { outline: 3px solid var(--p); outline-offset: 1px; }
+  [hidden] { display: none !important; }
+  .seg { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); }
+  .seg button { padding: 10px; border: 0; background: #fff; color: var(--ink); font: 600 14px var(--fb); cursor: pointer; }
+  .seg button.on { background: var(--ink); color: var(--bone); }
+  .chk { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-weight: 500; font-size: 14px; cursor: pointer; }
+  .chk input { width: 18px; height: 18px; accent-color: var(--p); }
+  .btn { display: inline-block; transform: skewX(-12deg); padding: 10px 18px; border: 0; background: var(--ink); color: var(--bone); cursor: pointer; }
+  .btn > span { display: inline-flex; align-items: center; gap: 8px; transform: skewX(12deg); font: 800 19px/1 var(--fd); white-space: nowrap; }
+  .btn.pri { background: var(--p); color: #fff; }
+  .btn.soft { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+  .btn img { width: 20px; height: 20px; }
+  .btn:focus-visible, .gtile:focus-visible, .mtile:focus-visible, .seg button:focus-visible { outline: 3px solid var(--p); outline-offset: 2px; }
+  .btn:active { transform: skewX(-12deg) translateY(1px); }
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+  .colorrow { display: flex; align-items: center; gap: 10px; }
+  .colorrow input[type=color] { width: 46px; height: 36px; padding: 2px; border: 1px solid var(--line); background: #fff; cursor: pointer; }
+
+  .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 20px; padding: 14px 16px; background: #fff; }
+  .toolbar .lbl { font: 800 24px/1 var(--fd); margin-right: 6px; }
+  .toolbar .sp { flex: 1; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 20px; }
+  .cards.h { grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); }
+  .sc { display: flex; flex-direction: column; gap: 10px; }
+  .screen { position: relative; aspect-ratio: 9 / 16; max-width: 100%; overflow: hidden; background: #fff; box-shadow: 0 0 0 1px var(--line); }
+  .cards.h .screen { aspect-ratio: 16 / 9; }
+  .screen.game { background: linear-gradient(160deg, #5b6b7d, #20252e); }
+  .screen iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .sc h3 { margin: 4px 0 0; font: 800 26px/1 var(--fd); }
+  .sc p { margin: 4px 0 0; font-size: 13px; color: var(--mute); }
+  .sc .meta { font-size: 12px; color: var(--mute); }
+  .acts { display: flex; gap: 10px; }
+
+  .guide { margin-top: 28px; padding: 18px 20px; background: #fff; border-top: 4px solid var(--ink); }
+  .guide summary { cursor: pointer; font: 800 26px/1 var(--fd); }
+  .guide ol { margin: 14px 0 0; padding-left: 22px; line-height: 1.65; max-width: 80ch; }
+  .guide li { margin-bottom: 8px; }
+  .guide code { padding: 1px 6px; background: var(--bone); font-size: 13px; }
+  .credit { margin: 18px 0 0; font-size: 12px; color: var(--mute); line-height: 1.6; max-width: 80ch; }
+  .credit a { color: inherit; }
+
+  @media (max-width: 900px) {
+    .hub-main { grid-template-columns: 1fr; padding: 20px 16px 40px; }
+    .hub-head { padding: 20px 16px 16px; }
+    .side { position: static; max-height: none; overflow: visible; }
+  }
+</style>
+</head>
+<body class="hub">
+<header class="hub-head">
+  <div class="brand">
+    <div>
+      <h1>Cute Live Kit</h1>
+      <p>Chọn game, chỉnh chữ, rồi copy link từng màn dán vào OBS hoặc TikTok LIVE Studio.</p>
+    </div>
+  </div>
+  <button class="btn soft" id="copyDock"><span>Copy link bảng điều khiển</span></button>
+</header>
+
+<div class="hub-main">
+  <aside class="side">
+    <section class="sec">
+      <h2>Game</h2>
+      <div class="games" id="games"></div>
+      <label class="f">Tên game tự đặt (tùy chọn)<input id="gamename" placeholder="Để trống thì dùng logo game"></label>
+    </section>
+
+    <section class="sec">
+      <h2>Nhân vật</h2>
+      <p class="hint" id="charhint"></p>
+      <label class="f" id="charqWrap">Tìm tướng<input id="charq" placeholder="VD: Ahri, Lux, Yuumi"></label>
+      <div class="chars" id="chars"></div>
+    </section>
+
+    <section class="sec">
+      <h2>Kênh</h2>
+      <label class="f">Tên hiển thị<input id="name" maxlength="28"></label>
+      <label class="f">TikTok ID (không cần @)<input id="handle" maxlength="30"></label>
+      <label class="f">Rank<input id="rank" placeholder="VD: Bạch Kim 2. Để trống thì ẩn"></label>
+      <label class="f">Câu giới thiệu<input id="msg" placeholder="Để trống thì dùng câu theo game"></label>
+    </section>
+
+    <section class="sec">
+      <h2>Bố cục</h2>
+      <div class="seg" id="layout"><button data-v="v">Dọc 9:16 (TikTok)</button><button data-v="h">Ngang 16:9</button></div>
+      <div class="two">
+        <label class="f">Khung cam<select id="cam"><option value="tr">Góc phải</option><option value="tl">Góc trái</option><option value="off">Ẩn</option></select></label>
+        <label class="f">Tỉ lệ cam<select id="camshape"><option value="sq">Vuông 1:1</option><option value="43">4:3</option><option value="169">16:9</option></select></label>
+      </div>
+      <label class="f">Cỡ khung cam <output id="camsizeOut"></output><input type="range" id="camsize" min="240" max="620" step="10"></label>
+      <label class="chk"><input type="checkbox" id="ticker"> Hiện dải chữ chạy</label>
+    </section>
+
+    <section class="sec">
+      <h2>Đếm ngược</h2>
+      <div class="two">
+        <label class="f">Số phút<input id="min" type="number" min="0" step="1"></label>
+        <label class="f">Hoặc giờ cố định<input id="at" type="time"></label>
+      </div>
+      <p class="hint">Có giờ cố định thì dùng giờ đó. Xóa giờ để dùng số phút.</p>
+    </section>
+
+    <section class="sec">
+      <h2>Mục tiêu follow</h2>
+      <div class="two">
+        <label class="f">Hiện có<input id="cur" type="number" min="0"></label>
+        <label class="f">Mục tiêu<input id="goal" type="number" min="1"></label>
+      </div>
+      <div class="steps"><button class="btn soft" data-step="-1"><span>−1</span></button><button class="btn" data-step="1"><span>+1</span></button><button class="btn" data-step="10"><span>+10</span></button></div>
+    </section>
+
+    <section class="sec">
+      <h2>Lời nhắn</h2>
+      <label class="f">Dải chữ chạy, mỗi dòng một câu<textarea id="msgs"></textarea></label>
+      <p class="hint">Viết <code>{handle}</code> để chèn TikTok ID. Để trống thì dùng câu mặc định.</p>
+      <label class="f">Live tiếp theo (màn Kết thúc và Ảnh bìa)<input id="next"></label>
+    </section>
+
+    <section class="sec">
+      <h2>Màu và âm thanh</h2>
+      <div class="colorrow"><input type="color" id="color"><span style="flex:1;font-size:14px">Màu chính</span><button class="btn soft" id="colorReset"><span>Theo game</span></button></div>
+      <label class="chk"><input type="checkbox" id="sound"> Âm thanh khi có alert</label>
+      <label class="chk"><input type="checkbox" id="ws"> Nhận follow và quà thật từ TikFinity (thử nghiệm)</label>
+    </section>
+  </aside>
+
+  <main>
+    <div class="toolbar">
+      <span class="lbl">Thử alert</span>
+      <button class="btn pri" data-alert="follow"><span>Follow</span></button>
+      <button class="btn pri" data-alert="gift"><span>Quà</span></button>
+      <button class="btn pri" data-alert="like"><span>Tim</span></button>
+      <button class="btn pri" data-alert="share"><span>Share</span></button>
+      <button class="btn pri" data-alert="sub"><span>Hội viên</span></button>
+      <span class="sp"></span>
+      <label class="chk" style="margin:0"><input type="checkbox" id="guides"> Hiện vùng TikTok che</label>
+    </div>
+    <div class="cards" id="cards"></div>
+
+    <details class="guide" id="guide">
+      <summary>Cách dùng với OBS và TikTok LIVE Studio</summary>
+      <ol>
+        <li><b>OBS:</b> Sources, bấm <b>+</b>, chọn <b>Browser</b>, dán link vào ô URL. Nếu chạy bằng file trên máy thì bỏ tick <i>Local file</i>. Width và Height đặt đúng kích thước ghi dưới mỗi màn.</li>
+        <li>Mỗi màn chờ (Sắp lên sóng, Tạm vắng, Kết thúc) là một Scene riêng. Scene chơi game xếp từ dưới lên: game, webcam, Overlay in-game, Alert. Kéo webcam khớp vào khung 4 góc.</li>
+        <li><b>Chỉnh khi đang live:</b> trong OBS vào Docks, Custom Browser Docks, dán link bảng điều khiển. Sửa số follow hay bấm thử alert là overlay đổi ngay.</li>
+        <li><b>TikTok LIVE Studio:</b> thêm nguồn Link (nếu bản của bạn có) và dán link. Nếu không có, live qua OBS bằng stream key của TikTok.</li>
+        <li><b>Ảnh bìa:</b> mở màn Ảnh bìa ở cửa sổ dọc rồi chụp màn hình, hoặc trong OBS chuột phải nguồn và chọn Screenshot.</li>
+        <li><b>Alert tự động:</b> mở app TikFinity đã kết nối live, tick ô TikFinity ở trên, copy lại link Alert và In-game rồi Refresh nguồn trong OBS. Tắt alert riêng của TikFinity để khỏi hiện hai lần.</li>
+        <li><b>Tách nhỏ:</b> thêm <code>&amp;only=cam</code>, <code>&amp;only=info</code> hoặc <code>&amp;only=ticker</code> vào cuối link In-game để chỉ hiện một phần.</li>
+        <li><b>Logo FC Online:</b> thả file <code>fconline.png</code> vào <code>assets/logos/</code>. Chưa có thì hiện tên chữ.</li>
+      </ol>
+    </details>
+    <p class="credit">Ảnh agent Valorant qua <a href="https://valorant-api.com" target="_blank" rel="noopener">valorant-api.com</a>, ảnh tướng qua Data Dragon của Riot. Logo game thuộc về các nhà phát hành, lấy từ Wikimedia Commons.<br>Cute Live Kit isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.</p>
+  </main>
+</div>
+
+<script src="assets/cute.js"></script>
+<script>
+  const $ = s => document.querySelector(s);
+  const SCENES = [
+    { f: 'starting.html', t: 'Sắp lên sóng', d: 'Màn chờ có đếm ngược.', solid: true },
+    { f: 'ingame.html', t: 'Overlay in-game', d: 'Thẻ người chơi, khung cam, mục tiêu follow, chữ chạy.' },
+    { f: 'alerts.html', t: 'Alert', d: 'Follow, quà, tim, share, hội viên. Bản xem trước tự chạy thử.' },
+    { f: 'brb.html', t: 'Tạm vắng', d: 'Đồng hồ đếm thời gian vắng.', solid: true },
+    { f: 'ending.html', t: 'Kết thúc', d: 'Lời cảm ơn và lịch live tiếp theo.', solid: true },
+    { f: 'cover.html', t: 'Ảnh bìa', d: 'Chụp màn hình làm ảnh bìa live.', solid: true }
+  ];
+  const TIKFINITY = 'ws://localhost:21213/';
+  const NAMES = ['Bánh Bao', 'Mochi', 'Trà Sữa', 'Mèo Mun', 'Kem Dâu', 'Su Kem'];
+  let cfg = CL.readCfg();
+  let hub = {};
+  try { hub = JSON.parse(localStorage.getItem('cuteLive.hub') || '{}') || {}; } catch (e) { /* bỏ qua */ }
+  const frames = [];
+
+  Object.entries(CL.THEMES).forEach(([id, t]) => {
+    const b = document.createElement('button');
+    b.className = 'gtile'; b.dataset.game = id; b.title = t.short; b.style.setProperty('--c', t.p);
+    b.innerHTML = t.logo
+      ? `<img src="${CL.LOGO + t.logo}" alt="${t.short}" onerror="this.outerHTML='<span class=gt>${t.short}</span>'">`
+      : `<span class="gt">${t.short}</span>`;
+    b.onclick = () => { cfg.game = id; changed(); };
+    $('#games').appendChild(b);
+  });
+
+  // Chọn nhân vật: agent Valorant hoặc tướng LMHT/ĐTCL; game khác dùng logo
+  let champs = null, charGame = null;
+  function loadChamps() {
+    const get = (v, loc) => fetch(`${CL.DD}${v}/data/${loc}/champion.json`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+    return CL.loadLolVer()
+      .then(v => get(v, 'vi_VN').catch(() => get(v, 'en_US')))
+      .then(d => { champs = Object.values(d.data).map(c => [c.name, c.id]).sort((a, b) => a[0].localeCompare(b[0], 'vi')); });
+  }
+  function renderChars() {
+    const box = $('#chars'), g = cfg.game;
+    charGame = g;
+    $('#charqWrap').hidden = !(g === 'lol' || g === 'tft');
+    if (g === 'valorant') {
+      $('#charhint').textContent = 'Agent Valorant, ảnh lấy từ trong game.';
+      box.innerHTML = CL.VALO_AGENTS.map(([n, id]) => `<button class="ctile" data-char="${id}" title="${n}"><img src="${CL.VALO + id}/displayicon.png" alt="${n}"></button>`).join('');
+    } else if (g === 'lol' || g === 'tft') {
+      $('#charhint').textContent = 'Tướng Liên Minh, ảnh từ Data Dragon của Riot.';
+      if (!champs) {
+        box.innerHTML = '<p class="hint">Đang tải danh sách tướng…</p>';
+        loadChamps().then(() => { if (charGame === g) renderChars(); })
+          .catch(() => { box.innerHTML = '<p class="hint">Không tải được danh sách tướng. Kiểm tra mạng rồi tải lại trang.</p>'; });
+        return;
+      }
+      const term = $('#charq').value.trim().toLowerCase();
+      box.innerHTML = champs.filter(([n, id]) => !term || n.toLowerCase().includes(term) || id.toLowerCase().includes(term))
+        .map(([n, id]) => `<button class="ctile" data-char="${id}" title="${n}"><img src="${CL.DD + CL.lolVer()}/img/champion/${id}.png" alt="${n}"></button>`).join('');
+    } else {
+      $('#charhint').textContent = 'Game này chưa có kho ảnh nhân vật công khai, overlay dùng logo game làm hình chính.';
+      box.innerHTML = '';
+    }
+    markChars();
+  }
+  function markChars() {
+    const art = CL.charArt(cfg);
+    document.querySelectorAll('.ctile').forEach(b => b.classList.toggle('on', !!art && art.icon.indexOf('/' + b.dataset.char + (cfg.game === 'valorant' ? '/' : '.')) !== -1));
+  }
+  $('#chars').addEventListener('click', e => { const b = e.target.closest('.ctile'); if (b) { cfg.char = b.dataset.char; changed(); } });
+  $('#charq').addEventListener('input', renderChars);
+
+  ['gamename', 'name', 'handle', 'rank', 'msg', 'cam', 'camshape', 'camsize', 'min', 'at', 'cur', 'goal', 'next'].forEach(k => {
+    const el = document.getElementById(k);
+    el.value = cfg[k];
+    el.addEventListener('input', () => { cfg[k] = k === 'handle' ? el.value.replace(/^@+/, '') : el.value; changed(); });
+  });
+  $('#msgs').value = cfg.msgs.split('|').filter(Boolean).join('\n');
+  $('#msgs').placeholder = CL.tickerList(Object.assign({}, cfg, { msgs: '' })).join('\n');
+  $('#msgs').addEventListener('input', e => {
+    cfg.msgs = e.target.value.split('\n').map(s => s.trim().replace(/\|/g, '/')).filter(Boolean).join('|');
+    changed();
+  });
+  ['ticker', 'sound'].forEach(k => {
+    const el = document.getElementById(k);
+    el.checked = cfg[k] !== '0';
+    el.addEventListener('change', () => { cfg[k] = el.checked ? '1' : '0'; changed(); });
+  });
+  $('#ws').checked = !!cfg.ws;
+  $('#ws').addEventListener('change', e => { cfg.ws = e.target.checked ? TIKFINITY : ''; changed(); });
+  $('#color').addEventListener('input', e => { cfg.color = e.target.value; changed(); });
+  $('#colorReset').onclick = () => { cfg.color = ''; changed(); };
+  document.querySelectorAll('#layout button').forEach(b => { b.onclick = () => { cfg.layout = b.dataset.v; changed(); }; });
+  document.querySelectorAll('[data-step]').forEach(b => {
+    b.onclick = () => { cfg.cur = String(Math.max(0, (parseInt(cfg.cur, 10) || 0) + +b.dataset.step)); $('#cur').value = cfg.cur; changed(); };
+  });
+
+  function urlFor(s, preview) {
+    const p = new URLSearchParams();
+    Object.keys(CL.DEFAULTS).forEach(k => p.set(k, cfg[k] == null ? '' : cfg[k]));
+    if (preview) {
+      p.set('preview', '1');
+      if (s.f === 'alerts.html') { p.set('demo', '1'); p.set('mute', '1'); }
+      if (hub.guides) p.set('guides', '1');
+    }
+    return new URL(s.f, location.href).href.split('?')[0] + '?' + p.toString();
+  }
+
+  async function copy(text, btn) {
+    try { await navigator.clipboard.writeText(text); }
+    catch (e) {
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    }
+    const label = btn.querySelector('span') || btn;
+    const old = label.textContent;
+    label.textContent = 'Đã copy';
+    setTimeout(() => { label.textContent = old; }, 1500);
+  }
+
+  SCENES.forEach(s => {
+    const el = document.createElement('article');
+    el.className = 'sc';
+    el.innerHTML = `<div class="screen ${s.solid ? '' : 'game'}"><iframe title="${s.t}"></iframe></div>` +
+      `<div><h3>${s.t}</h3><p>${s.d}</p><p class="meta"><span class="sz"></span>, ${s.solid ? 'nền đầy đủ' : 'nền trong suốt'}</p></div>` +
+      '<div class="acts"><button class="btn pri copy"><span>Copy link</span></button><button class="btn soft open"><span>Mở</span></button></div>';
+    const fr = el.querySelector('iframe');
+    fr.src = urlFor(s, true);
+    frames.push(fr);
+    el.querySelector('.copy').onclick = e => copy(urlFor(s, false), e.currentTarget);
+    el.querySelector('.open').onclick = () => window.open(urlFor(s, false), '_blank');
+    $('#cards').appendChild(el);
+  });
+
+  $('#copyDock').onclick = e => copy(location.href.split('?')[0].split('#')[0], e.currentTarget);
+  $('#guides').checked = !!hub.guides;
+  $('#guides').addEventListener('change', e => {
+    hub.guides = e.target.checked;
+    try { localStorage.setItem('cuteLive.hub', JSON.stringify(hub)); } catch (err) { /* bỏ qua */ }
+    frames.forEach(f => f.contentWindow && f.contentWindow.postMessage({ kind: 'guides', on: hub.guides }, '*'));
+  });
+
+  function post(msg) { frames.forEach(f => f.contentWindow && f.contentWindow.postMessage(msg, '*')); }
+
+  document.querySelectorAll('[data-alert]').forEach(b => {
+    b.onclick = () => {
+      const type = b.dataset.alert;
+      post(CL.send({ kind: 'alert', ev: { type, user: CL.pick(NAMES), gift: CL.pick(['Hoa hồng', 'Gấu bông', 'Vương miện']), count: type === 'like' ? 50 : 3 } }));
+    };
+  });
+
+  let sendTimer = null;
+  function changed() {
+    try { localStorage.setItem('cuteLive.cfg', JSON.stringify(cfg)); } catch (e) { /* bỏ qua */ }
+    const t = CL.applyTheme(cfg);
+    $('#color').value = cfg.color || t.p;
+    document.querySelectorAll('.gtile').forEach(b => b.classList.toggle('on', b.dataset.game === cfg.game));
+    if (charGame !== cfg.game) renderChars(); else markChars();
+    document.querySelectorAll('#layout button').forEach(b => b.classList.toggle('on', b.dataset.v === cfg.layout));
+    $('#cards').classList.toggle('h', cfg.layout === 'h');
+    document.querySelectorAll('.sz').forEach(x => { x.textContent = cfg.layout === 'h' ? '1920×1080' : '1080×1920'; });
+    $('#camsizeOut').textContent = cfg.camsize + 'px';
+    clearTimeout(sendTimer);
+    sendTimer = setTimeout(() => post(CL.send({ kind: 'cfg', cfg })), 120);
+  }
+  changed();
+</script>
+</body>
+</html>

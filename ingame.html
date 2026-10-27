@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Overlay in-game</title>
+<link rel="stylesheet" href="assets/cute.css">
+<style>
+  /* Cột thông tin: thẻ người chơi, logo game + rank, mục tiêu follow */
+  .info { position: absolute; top: 210px; left: 48px; width: 600px; display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+  .player { position: relative; width: 100%; padding-top: 34px; }
+  .player .plate { padding: 26px 30px 24px 190px; min-height: 150px; }
+  .player .por { position: absolute; left: 20px; bottom: 18px; width: 150px; height: 150px; background: var(--p2); }
+  .player .por > span { position: absolute; inset: 0; }
+  .player .por .art-icon.cut { inset: -30px -10px 0; }
+  .player .por .art-logo { clip-path: none; }
+  .nm { font: 800 64px/1 var(--fd); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .meta { display: flex; align-items: center; gap: 14px; margin-top: 10px; font: 600 28px/1 var(--fb); color: var(--mute); }
+  .meta .tag { padding: 6px 16px 4px; }
+  .meta .tag > span { font-size: 26px; }
+  .strip { display: flex; gap: 10px; align-items: stretch; }
+  .strip .logo { height: 70px; }
+  .strip .tag { display: flex; align-items: center; }
+  .strip .tag > span { font-size: 32px; }
+  .goal { width: 100%; padding: 22px 30px 26px; }
+  .goal .row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; }
+  .goal .lbl { font: 600 28px/1 var(--fb); color: var(--mute); }
+  .goal .num { font-size: 56px; }
+  .goal .segs { height: 24px; }
+  .goal.done .lbl { color: var(--p); }
+
+  /* Khung cam: 4 góc ngắm kiểu HUD, giữa trong suốt để đặt webcam bên dưới */
+  .cam { position: absolute; top: 250px; right: 48px; width: var(--cw, 380px); height: var(--ch, 380px); }
+  .cam .edge { position: absolute; inset: 0; border: 4px solid var(--bone); }
+  .cam .br { position: absolute; width: 74px; height: 74px; border: 12px solid var(--p); }
+  .cam .br.tl { left: -12px; top: -12px; border-right: 0; border-bottom: 0; }
+  .cam .br.tr { right: -12px; top: -12px; border-left: 0; border-bottom: 0; }
+  .cam .br.bl { left: -12px; bottom: -12px; border-right: 0; border-top: 0; }
+  .cam .br.brr { right: -12px; bottom: -12px; border-left: 0; border-top: 0; }
+  .cam .camtag { position: absolute; left: 40px; bottom: -30px; }
+  .cam .camtag > span { font-size: 30px; }
+
+  /* Dải chữ chạy: khối nghiêng */
+  .ticker { position: absolute; top: 760px; left: 48px; max-width: 900px; }
+  .ticker .tk { display: flex; align-items: stretch; transform: skewX(-12deg); background: var(--bone); }
+  .ticker .ic { display: grid; place-items: center; width: 64px; background: var(--p); color: #fff; font-size: 40px; }
+  .ticker .tx { padding: 16px 30px 14px; transform: skewX(12deg); font: 600 32px/1.2 var(--fb); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* Vị trí khác */
+  body.cam-tl .cam { right: auto; left: 48px; }
+  body.cam-tl .info { left: auto; right: 48px; align-items: flex-end; }
+  body.cam-off .cam { display: none; }
+  body.h .info { top: auto; bottom: 48px; left: 48px; }
+  body.h .cam { top: 130px; right: 64px; }
+  body.h.cam-tl .cam { left: 64px; }
+  body.h.cam-tl .info { left: auto; right: 48px; }
+  body.h .ticker { top: auto; bottom: 56px; left: 700px; max-width: 760px; }
+  body.only-cam .info, body.only-cam .ticker,
+  body.only-info .cam, body.only-info .ticker,
+  body.only-ticker .info, body.only-ticker .cam { display: none !important; }
+
+  /* Vùng giao diện TikTok trên điện thoại (ước lượng, chỉ hiện khi xem trước) */
+  .guides { position: absolute; inset: 0; z-index: 9; display: none; pointer-events: none; }
+  body.show-guides:not(.h) .guides { display: block; }
+  .gz { position: absolute; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px;
+    background: repeating-linear-gradient(45deg, rgba(255, 255, 255, .14) 0 16px, rgba(255, 255, 255, .04) 16px 32px);
+    border: 4px dashed rgba(255, 255, 255, .7); color: #fff; font: 700 34px/1.2 var(--fb); text-shadow: 0 2px 6px rgba(0, 0, 0, .5); }
+  .gz.top { left: 0; right: 0; top: 0; height: 190px; }
+  .gz.bot { left: 0; bottom: 0; width: 780px; height: 640px; }
+  .gz.side { right: 0; bottom: 240px; width: 160px; height: 760px; }
+</style>
+</head>
+<body>
+<div class="viewport"><div class="stage">
+  <div class="info lift">
+    <div class="player">
+      <div class="plate">
+        <div class="nm" data-bind="name"></div>
+        <div class="meta"><span class="tag"><span><i class="dot"></i>LIVE</span></span><span data-bind="handle"></span></div>
+      </div>
+      <div class="por" data-art="icon"></div>
+    </div>
+    <div class="strip">
+      <span class="logo" data-game></span>
+      <span class="tag ink" id="rank"><span>Rank <span data-bind="rank" style="color:var(--p2)"></span></span></span>
+    </div>
+    <div class="plate goal" id="goal">
+      <div class="row"><span class="lbl" id="glabel">Mục tiêu follow</span><span class="num" id="gnum">0/100</span></div>
+      <div class="segs" id="gbar"></div>
+    </div>
+  </div>
+
+  <div class="cam lift" id="cam">
+    <div class="edge"></div>
+    <i class="br tl"></i><i class="br tr"></i><i class="br bl"></i><i class="br brr"></i>
+    <span class="tag camtag"><span data-bind="name"></span></span>
+  </div>
+
+  <div class="ticker lift" id="ticker"><div class="tk"><span class="ic"><i class="dot"></i></span><span class="tx"><span class="rot" id="tk"></span></span></div></div>
+
+  <div class="guides">
+    <div class="gz top">Tên kênh và số người xem của TikTok</div>
+    <div class="gz bot">Bình luận và quà (TikTok che vùng này)</div>
+    <div class="gz side">Nút</div>
+  </div>
+</div></div>
+<script src="assets/cute.js"></script>
+<script>
+  const $ = id => document.getElementById(id);
+  const ticker = CL.rotator($('tk'), 4500);
+  if (CL.q.only) document.body.classList.add('only-' + CL.q.only);
+  document.body.classList.toggle('show-guides', CL.q.guides === '1');
+
+  let bonus = 0, lastCur = null;
+  function renderGoal(cfg) {
+    const cur = (parseInt(cfg.cur, 10) || 0) + bonus, goal = Math.max(1, parseInt(cfg.goal, 10) || 100);
+    const done = cur >= goal;
+    $('gnum').innerHTML = CL.digits(cur + '/' + goal);
+    $('glabel').textContent = done ? 'Đạt mục tiêu rồi' : 'Mục tiêu follow';
+    $('goal').classList.toggle('done', done);
+    CL.segs($('gbar'), cur / goal, 20);
+  }
+
+  const st = CL.init(cfg => {
+    const b = document.body.classList;
+    b.toggle('cam-tl', cfg.cam === 'tl');
+    b.toggle('cam-off', cfg.cam === 'off');
+    const size = Math.max(160, parseInt(cfg.camsize, 10) || 380);
+    const ratio = { sq: 1, '43': 0.75, '169': 0.5625 }[cfg.camshape] || 1;
+    $('cam').style.setProperty('--cw', size + 'px');
+    $('cam').style.setProperty('--ch', Math.round(size * ratio) + 'px');
+    $('rank').style.display = cfg.rank ? '' : 'none';
+    $('ticker').style.display = cfg.ticker === '0' ? 'none' : '';
+    ticker.set(CL.tickerList(cfg));
+    if (cfg.cur !== lastCur) { bonus = 0; lastCur = cfg.cur; }
+    renderGoal(cfg);
+  });
+
+  CL.listen(msg => { if (msg.kind === 'guides') document.body.classList.toggle('show-guides', !!msg.on); });
+  // Follow thật từ TikFinity → tự cộng vào thanh mục tiêu
+  CL.tiktok(st.cfg.ws, ev => { if (ev === 'follow') { bonus++; renderGoal(st.cfg); } });
+</script>
+</body>
+</html>

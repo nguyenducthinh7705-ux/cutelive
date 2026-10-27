@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tạm vắng</title>
+<link rel="stylesheet" href="assets/cute.css">
+<style>
+  .tag .dot { animation-duration: 3s; }
+  .portrait .art { filter: saturate(.7); }
+</style>
+</head>
+<body>
+<div class="viewport"><div class="stage scene">
+  <div class="field"><div class="band"></div></div>
+  <div class="topbar">
+    <span class="logo" data-game></span>
+    <span class="tag ink"><span><i class="dot"></i>Tạm vắng</span></span>
+  </div>
+  <div class="portrait"><div class="art" data-art="portrait"></div></div>
+  <div class="copy">
+    <h1 class="title">Đợi xíu nha</h1>
+    <div class="sub">Mình quay lại liền, đừng đi đâu nha</div>
+    <div class="lift"><div class="plate panel">
+      <div class="row">
+        <span class="lbl">Đã vắng mặt</span>
+        <span class="num big" id="time">00:00</span>
+      </div>
+    </div></div>
+  </div>
+  <div class="foot">
+    <span class="tipline"><span class="rot" id="tips"></span></span>
+    <span class="tag ink"><span data-bind="handle"></span></span>
+  </div>
+</div></div>
+<script src="assets/cute.js"></script>
+<script>
+  const $ = id => document.getElementById(id);
+  CL.rotator($('tips'), 4200).set([
+    'Tranh thủ thả tim giữ live nha',
+    'Ai chưa follow thì follow đi nè',
+    'Mình đi uống nước xíu'
+  ]);
+  CL.init();
+  const start = Date.now();
+  const tick = () => { $('time').innerHTML = CL.digits(CL.fmt(Date.now() - start)); };
+  tick(); setInterval(tick, 500);
+</script>
+</body>
+</html>

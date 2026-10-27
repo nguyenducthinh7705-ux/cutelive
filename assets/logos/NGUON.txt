@@ -1,0 +1,14 @@
+﻿Logo game tải từ Wikimedia Commons / Wikipedia. Logo là thương hiệu của các nhà phát hành
+(Riot Games, Garena, Tencent, HoYoverse, Mojang/Microsoft, Krafton, Roblox Corp.), chỉ dùng để ghi tên game đang chơi.
+
+valorant.svg  — commons: File:Valorant logo - pink color version.svg
+lol.svg       — commons: File:League of Legends 2019 vector.svg
+tft.svg       — commons: File:Teamfight Tactics logo.svg
+lienquan.png  — commons: File:Arena of Valor logo.png
+genshin.svg   — commons: File:Genshin Impact wordmark.svg
+minecraft.svg — commons: File:Minecraft Logo-en.svg
+pubg.svg      — commons: File:PUBG Mobile simple logo black.svg
+roblox.svg    — commons: File:Roblox Logo 2022.svg
+freefire.svg  — en.wikipedia: File:Free Fire.svg
+
+FC Online: không có trên Wikimedia. Tự thả file logo tên "fconline.png" vào folder này là trang tự nhận.

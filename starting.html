@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sắp lên sóng</title>
+<link rel="stylesheet" href="assets/cute.css">
+<style>
+  .panel .big.go { font-size: 110px; }
+</style>
+</head>
+<body>
+<div class="viewport"><div class="stage scene">
+  <div class="field"><div class="band"></div></div>
+  <div class="topbar">
+    <span class="logo" data-game></span>
+    <span class="tag"><span><i class="dot"></i>Sắp live</span></span>
+  </div>
+  <div class="portrait"><div class="art" data-art="portrait"></div></div>
+  <div class="copy">
+    <h1 class="title">Sắp lên sóng</h1>
+    <div class="sub" data-bind="tag"></div>
+    <div class="lift"><div class="plate panel">
+      <div class="row">
+        <span class="lbl">Bắt đầu sau</span>
+        <span class="num big" id="time">05:00</span>
+      </div>
+      <div class="segs" id="bar"></div>
+    </div></div>
+  </div>
+  <div class="foot">
+    <span class="tipline"><span class="rot" id="tips"></span></span>
+    <span class="tag ink"><span data-bind="handle"></span></span>
+  </div>
+</div></div>
+<script src="assets/cute.js"></script>
+<script>
+  const $ = id => document.getElementById(id);
+  CL.rotator($('tips'), 4200).set([
+    'Lấy ly trà sữa ngồi đợi nha',
+    'Nhớ bấm follow để nhận thông báo',
+    'Hôm nay quyết tâm leo rank'
+  ]);
+
+  let start = Date.now(), target = start, total = 1, key = null;
+  CL.init(cfg => {
+    const k = cfg.min + '|' + cfg.at;
+    if (k === key) return;
+    key = k; start = Date.now();
+    target = CL.targetTime(cfg, start);
+    total = Math.max(target - start, 1000);
+    tick();
+  });
+
+  function tick() {
+    const left = target - Date.now(), t = $('time');
+    const done = left <= 0;
+    t.classList.toggle('go', done);
+    t.innerHTML = done ? 'Lên sóng!' : CL.digits(CL.fmt(left));
+    CL.segs($('bar'), done ? 1 : 1 - left / total, 24);
+  }
+  setInterval(tick, 250);
+</script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+@import url('https://fonts.googleapis.com/css2?family=Saira+Extra+Condensed:wght@700;800&family=Saira:wght@400;500;600;700&display=swap');
+
+/* Bố cục: HUD game bản pastel. Khối đặc góc vuông, vát một góc, sọc màu game trên đầu,
+   nhãn nghiêng như nút trong game, thanh tiến độ chia vạch. Điểm nhấn duy nhất: linh vật 3D
+   trồi ra khỏi khung như chân dung nhân vật. Căn trái, giữ trong vùng an toàn 5%.
+   JS ghi đè theo game: --p (màu tín hiệu), --p2 (pastel), --ink (chữ đậm), --bg1 (nền kem). */
+:root {
+  --p: #ff4f6d; --p2: #ffd6de; --a: #7fd4e6; --ink: #2a1520; --bg1: #fff6f7;
+  --bone: var(--bg1);
+  --mute: rgba(42, 21, 32, .62);
+  --line: rgba(42, 21, 32, .16);
+  --fd: 'Saira Extra Condensed', 'Arial Narrow', 'Segoe UI', sans-serif;
+  --fb: 'Saira', 'Segoe UI', system-ui, sans-serif;
+  --cut: 28px;
+  --ease: cubic-bezier(.85, 0, .15, 1);
+  --safe: 64px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; }
+body { font-family: var(--fb); color: var(--ink); -webkit-font-smoothing: antialiased; }
+img { user-select: none; -webkit-user-drag: none; }
+
+/* Sân khấu cố định 1080×1920 (dọc) hoặc 1920×1080 (ngang), tự co theo cửa sổ */
+.viewport { position: fixed; inset: 0; overflow: hidden; }
+.stage {
+  position: absolute; left: 50%; top: 50%; width: 1080px; height: 1920px; overflow: hidden;
+  transform: translate(-50%, -50%) scale(var(--s, 1));
+}
+body.h .stage { width: 1920px; height: 1080px; }
+
+/* ---------- Khối HUD ---------- */
+.plate {
+  position: relative; background: var(--bone); color: var(--ink);
+  clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, 0 100%);
+}
+.plate::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 6px; background: var(--p); }
+.plate.flat::before { display: none; }
+.lift { filter: drop-shadow(0 14px 22px rgba(20, 8, 16, .32)); }
+
+/* Nhãn nghiêng: khung nghiêng, chữ nghiêng ngược lại để đứng thẳng */
+.tag { display: inline-block; transform: skewX(-12deg); background: var(--p); color: #fff; padding: 8px 22px 6px; white-space: nowrap; }
+.tag > span { display: inline-flex; align-items: center; gap: 10px; transform: skewX(12deg); font: 800 34px/1 var(--fd); letter-spacing: .02em; }
+.tag.ink { background: var(--ink); color: var(--bone); }
+.tag.bone { background: var(--bone); color: var(--ink); }
+.dot { width: .42em; height: .42em; flex: none; background: currentColor; animation: blinkdot 1.4s steps(2, jump-none) infinite; }
+@keyframes blinkdot { 50% { opacity: .2; } }
+
+/* Logo game thật trong ô sáng */
+.logo { display: inline-flex; align-items: center; gap: 12px; height: 76px; padding: 0 24px; background: #fff; }
+.logo .glogo { display: block; height: calc(38px * var(--lh, 1)); width: auto; max-width: 300px; }
+.logo .gico { width: 44px; height: 44px; }
+.logo .gtxt { font: 800 34px/1 var(--fd); white-space: nowrap; }
+.logo .gtxt.alt { display: none; }
+.logo.nologo .gtxt.alt { display: inline; }
+
+/* Thanh vạch như thanh đạn */
+.segs { display: grid; grid-template-columns: repeat(var(--n, 20), 1fr); gap: 6px; height: 30px; }
+.segs i { background: var(--p2); transform: skewX(-14deg); transition: background .3s; }
+.segs i.on { background: var(--p); }
+
+/* Số: mỗi chữ số rộng cố định để đồng hồ không giật */
+.num { font: 800 1em/1 var(--fd); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.num .dg { display: inline-block; width: .5em; text-align: center; }
+
+.rot { display: inline-block; transition: opacity .3s, transform .3s var(--ease); }
+.rot.out { opacity: 0; transform: translateY(10px); }
+
+/* ---------- Ảnh nhân vật chính thức / logo ---------- */
+.art-cut, .art-card, .art-logo, .art-icon { position: relative; display: block; }
+.art-cut img, .art-card img, .art-icon img { display: block; width: 100%; height: 100%; }
+.art-cut img { object-fit: contain; object-position: bottom; }
+.art-card { padding: 10px; background: var(--bone); clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, 0 100%); }
+.art-card::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 8px; background: var(--p); z-index: 1; }
+.art-card img { object-fit: cover; object-position: top; }
+.art-logo { display: grid; place-items: center; background: #fff; clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, 0 100%); }
+.art-logo img { max-width: 78%; max-height: 62%; }
+.art-logo b { font: 800 64px/1 var(--fd); text-align: center; padding: 0 20px; }
+.art-icon img { object-fit: cover; }
+.art-icon.cut img { object-fit: contain; object-position: bottom; }
+
+/* ---------- Màn chờ (nền đầy đủ) ---------- */
+.field { position: absolute; inset: 0; background: var(--bone); overflow: hidden; }
+.field .band { position: absolute; left: -10%; right: -10%; top: 300px; height: 520px; background: var(--p2); transform: skewY(-9deg); }
+.field .band::after { content: ""; position: absolute; left: 0; right: 0; bottom: -26px; height: 10px; background: var(--p); }
+
+.scene .topbar { position: absolute; left: var(--safe); right: var(--safe); top: 92px; display: flex; justify-content: space-between; align-items: center; padding-bottom: 22px; border-bottom: 2px solid var(--line); }
+.scene .topbar .logo { background: transparent; padding: 0; height: 100px; }
+.scene .topbar .logo .glogo { height: calc(52px * var(--lh, 1)); max-width: 420px; }
+.scene .portrait { position: absolute; left: 0; right: 0; top: 250px; height: 720px; display: flex; justify-content: flex-end; align-items: flex-end; padding-right: 90px; }
+/* Ảnh agent gốc là toàn thân: phóng to lấy nửa người trên, mờ dần ở đáy */
+.scene .portrait .art-cut { width: 900px; height: 820px; margin-right: -120px; overflow: hidden;
+  -webkit-mask-image: linear-gradient(#000 78%, transparent); mask-image: linear-gradient(#000 78%, transparent); }
+.scene .portrait .art-cut img { object-fit: cover; object-position: 50% 0; transform: scale(1.9); transform-origin: 50% 6%; }
+.scene .portrait .art-card { width: 400px; height: 727px; margin-right: 20px; transform: rotate(3deg); filter: drop-shadow(0 24px 30px rgba(20, 8, 16, .25)); }
+.scene .portrait .art-logo { width: 620px; height: 400px; margin-bottom: 120px; filter: drop-shadow(0 24px 30px rgba(20, 8, 16, .18)); }
+.scene .copy { position: absolute; left: var(--safe); right: var(--safe); bottom: 230px; display: flex; flex-direction: column; gap: 26px; }
+.scene .title { margin: 0; font: 800 200px/.98 var(--fd); text-transform: uppercase; letter-spacing: -.005em; color: var(--ink); text-wrap: balance; overflow-wrap: anywhere; }
+.scene .sub { font: 500 40px/1.35 var(--fb); color: var(--mute); }
+.scene .panel { padding: 34px 40px 36px; display: flex; flex-direction: column; gap: 22px; }
+.scene .panel .row { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; }
+.scene .panel .lbl { font: 600 34px/1.2 var(--fb); color: var(--mute); }
+.scene .panel .big { font-size: 170px; color: var(--ink); margin-bottom: -14px; }
+.scene .foot { position: absolute; left: var(--safe); right: var(--safe); bottom: 96px; display: flex; justify-content: space-between; align-items: center; gap: 24px; font: 600 34px/1.3 var(--fb); }
+.scene .foot .tipline { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.scene .foot .tipline img { width: 46px; height: 46px; flex: none; }
+
+body.h .field .band { top: -10%; bottom: -10%; height: auto; left: 0; right: auto; width: 820px; transform: skewX(-9deg); transform-origin: 0 100%; }
+body.h .field .band::after { left: auto; right: -26px; top: 0; bottom: 0; width: 10px; height: auto; }
+body.h .scene .topbar { top: 54px; }
+body.h .scene .portrait { top: 170px; height: 760px; width: 820px; right: auto; justify-content: center; align-items: center; padding-right: 0; }
+body.h .scene .portrait { align-items: flex-end; }
+body.h .scene .portrait .art-cut { width: 820px; height: 900px; margin: 0; }
+body.h .scene .portrait .art-card { width: 380px; height: 691px; margin: 0 0 40px; }
+body.h .scene .portrait .art-logo { width: 560px; height: 360px; margin: 0 0 200px; }
+body.h .scene .copy { left: 900px; bottom: 170px; }
+body.h .scene .title { font-size: 170px; }
+body.h .scene .panel .big { font-size: 150px; }
+body.h .scene .foot { left: 900px; bottom: 56px; }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }

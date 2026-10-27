@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ảnh bìa LIVE</title>
+<link rel="stylesheet" href="assets/cute.css">
+<style>
+  /* Ảnh bìa: tên kênh là tiêu đề, lịch live là thông tin chính */
+  .scene .title { font-size: 210px; }
+  .next-txt { font: 800 110px/1 var(--fd); color: var(--p); overflow-wrap: anywhere; }
+  body.h .scene .title { font-size: 180px; }
+</style>
+</head>
+<body>
+<div class="viewport"><div class="stage scene">
+  <div class="field"><div class="band"></div></div>
+  <div class="topbar">
+    <span class="logo" data-game></span>
+    <span class="tag"><span><i class="dot"></i>LIVE</span></span>
+  </div>
+  <div class="portrait"><div class="art" data-art="portrait"></div></div>
+  <div class="copy">
+    <h1 class="title" data-bind="name"></h1>
+    <div class="sub" data-bind="tag"></div>
+    <div class="lift"><div class="plate panel">
+      <span class="lbl">Lịch live</span>
+      <span class="next-txt" data-bind="next"></span>
+    </div></div>
+  </div>
+  <div class="foot">
+    <span></span>
+    <span class="tag ink"><span data-bind="handle"></span></span>
+  </div>
+</div></div>
+<script src="assets/cute.js"></script>
+<script>CL.init();</script>
+</body>
+</html>
