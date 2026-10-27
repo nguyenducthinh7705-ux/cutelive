@@ -186,7 +186,7 @@
         <li><b>Chỉnh khi đang live:</b> trong OBS vào Docks, Custom Browser Docks, dán link bảng điều khiển. Sửa số follow hay bấm thử alert là overlay đổi ngay.</li>
         <li><b>TikTok LIVE Studio:</b> thêm nguồn Link (nếu bản của bạn có) và dán link. Nếu không có, live qua OBS bằng stream key của TikTok.</li>
         <li><b>Ảnh bìa:</b> mở màn Ảnh bìa ở cửa sổ dọc rồi chụp màn hình, hoặc trong OBS chuột phải nguồn và chọn Screenshot.</li>
-        <li><b>Alert tự động:</b> mở app TikFinity đã kết nối live, tick ô TikFinity ở trên, copy lại link Alert và In-game rồi Refresh nguồn trong OBS. Tắt alert riêng của TikFinity để khỏi hiện hai lần.</li>
+        <li><b>Alert và thanh follow tự chạy theo live thật:</b> mở app TikFinity trên máy, kết nối live và bật Event API. Mở bảng điều khiển <b>từ file trên máy</b> (file <code>index.html</code> trong folder CuteLiveKit, không dùng bản online vì trình duyệt chặn bản online nối vào máy), tick ô TikFinity, đợi dòng “Đã kết nối TikFinity”, rồi copy link Alert và In-game dán vào OBS. Tắt alert riêng của TikFinity để khỏi hiện hai lần.</li>
         <li><b>Tách nhỏ:</b> thêm <code>&amp;only=cam</code>, <code>&amp;only=info</code> hoặc <code>&amp;only=ticker</code> vào cuối link In-game để chỉ hiện một phần.</li>
         <li><b>Logo FC Online:</b> thả file <code>fconline.png</code> vào <code>assets/logos/</code>. Chưa có thì hiện tên chữ.</li>
       </ol>
@@ -342,13 +342,17 @@
   });
 
   // Trạng thái kết nối TikFinity, hiện ngay dưới ô tick
+  // Chrome chặn trang https nối vào máy (127.0.0.1), nên TikFinity chỉ chạy với bản mở từ file trên máy
+  const ONLINE = location.protocol === 'https:';
   CL.onTiktokStatus(ok => {
     const el = $('#wsStatus');
     el.hidden = !cfg.ws;
     el.style.color = ok ? 'var(--p)' : '';
     el.textContent = ok
       ? 'Đã kết nối TikFinity. Follow và quà thật sẽ tự hiện alert.'
-      : 'Chưa thấy TikFinity. Mở app TikFinity trên máy này, kết nối live, và bật Event API (cổng 21213).';
+      : ONLINE
+        ? 'Bản online bị trình duyệt chặn nối vào TikFinity. Mở file index.html trong folder CuteLiveKit trên máy rồi copy link từ đó.'
+        : 'Chưa thấy TikFinity. Mở app TikFinity trên máy này, kết nối live và bật Event API (cổng 21213).';
   });
 
   let sendTimer = null;
