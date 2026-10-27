@@ -82,10 +82,10 @@
     </div>
     <div class="strip">
       <span class="logo" data-game></span>
-      <span class="tag ink" id="rank"><span>Rank <span data-bind="rank" style="color:var(--p2)"></span></span></span>
+      <span class="tag ink" id="rank"><span><span data-t="rank"></span> <span data-bind="rank" style="color:var(--p2)"></span></span></span>
     </div>
     <div class="plate goal" id="goal">
-      <div class="row"><span class="lbl" id="glabel">Mục tiêu follow</span><span class="num" id="gnum">0/100</span></div>
+      <div class="row"><span class="lbl" id="glabel"></span><span class="num" id="gnum">0/100</span></div>
       <div class="segs" id="gbar"></div>
     </div>
   </div>
@@ -116,7 +116,7 @@
     const cur = (parseInt(cfg.cur, 10) || 0) + bonus, goal = Math.max(1, parseInt(cfg.goal, 10) || 100);
     const done = cur >= goal;
     $('gnum').innerHTML = CL.digits(cur + '/' + goal);
-    $('glabel').textContent = done ? 'Đạt mục tiêu rồi' : 'Mục tiêu follow';
+    $('glabel').textContent = CL.t(cfg, done ? 'goalDone' : 'goal');
     $('goal').classList.toggle('done', done);
     CL.segs($('gbar'), cur / goal, 20);
   }

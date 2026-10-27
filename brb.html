@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tạm vắng</title>
+<title>Be right back</title>
 <link rel="stylesheet" href="assets/cute.css">
 <style>
   .tag .dot { animation-duration: 3s; }
@@ -15,15 +15,15 @@
   <div class="field"><div class="band"></div></div>
   <div class="topbar">
     <span class="logo" data-game></span>
-    <span class="tag ink"><span><i class="dot"></i>Tạm vắng</span></span>
+    <span class="tag ink"><span><i class="dot"></i><span data-t="brbTag"></span></span></span>
   </div>
   <div class="portrait"><div class="art" data-art="portrait"></div></div>
   <div class="copy">
-    <h1 class="title">Đợi xíu nha</h1>
-    <div class="sub">Mình quay lại liền, đừng đi đâu nha</div>
+    <h1 class="title" data-t="brbTitle"></h1>
+    <div class="sub" data-t="brbSub"></div>
     <div class="lift"><div class="plate panel">
       <div class="row">
-        <span class="lbl">Đã vắng mặt</span>
+        <span class="lbl" data-t="away"></span>
         <span class="num big" id="time">00:00</span>
       </div>
     </div></div>
@@ -36,12 +36,8 @@
 <script src="assets/cute.js"></script>
 <script>
   const $ = id => document.getElementById(id);
-  CL.rotator($('tips'), 4200).set([
-    'Tranh thủ thả tim giữ live nha',
-    'Ai chưa follow thì follow đi nè',
-    'Mình đi uống nước xíu'
-  ]);
-  CL.init();
+  const tips = CL.rotator($('tips'), 4200);
+  CL.init(cfg => tips.set(CL.t(cfg, 'brbTips')));
   const start = Date.now();
   const tick = () => { $('time').innerHTML = CL.digits(CL.fmt(Date.now() - start)); };
   tick(); setInterval(tick, 500);

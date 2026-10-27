@@ -3,11 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kết thúc live</title>
+<title>Thanks for watching</title>
 <link rel="stylesheet" href="assets/cute.css">
 <style>
   .next-txt { font: 800 110px/1 var(--fd); color: var(--p); overflow-wrap: anywhere; }
-  .panel .lbl b { color: var(--ink); font-weight: 700; }
 </style>
 </head>
 <body>
@@ -15,20 +14,20 @@
   <div class="field"><div class="band"></div></div>
   <div class="topbar">
     <span class="logo" data-game></span>
-    <span class="tag ink"><span>Hết live</span></span>
+    <span class="tag ink"><span data-t="endTag"></span></span>
   </div>
   <div class="portrait"><div class="art" data-art="portrait"></div></div>
   <div class="copy">
-    <h1 class="title">Cảm ơn cả nhà</h1>
-    <div class="sub">Hôm nay vui lắm luôn á. Ngủ ngon nha mọi người.</div>
+    <h1 class="title" data-t="endTitle"></h1>
+    <div class="sub" data-t="endSub"></div>
     <div class="lift"><div class="plate panel">
-      <span class="lbl">Live tiếp theo</span>
+      <span class="lbl" data-t="nextLive"></span>
       <span class="next-txt" data-bind="next"></span>
-      <span class="lbl">Follow <b data-bind="handle"></b> để được báo khi lên sóng</span>
+      <span class="lbl" data-t="followNotify"></span>
     </div></div>
   </div>
   <div class="foot">
-    <span class="tipline"><span>Mai gặp lại nha</span></span>
+    <span class="tipline"><span data-t="seeYou"></span></span>
     <span class="tag ink"><span data-bind="handle"></span></span>
   </div>
 </div></div>

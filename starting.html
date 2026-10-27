@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sắp lên sóng</title>
+<title>Starting soon</title>
 <link rel="stylesheet" href="assets/cute.css">
 <style>
   .panel .big.go { font-size: 110px; }
@@ -14,15 +14,15 @@
   <div class="field"><div class="band"></div></div>
   <div class="topbar">
     <span class="logo" data-game></span>
-    <span class="tag"><span><i class="dot"></i>Sắp live</span></span>
+    <span class="tag"><span><i class="dot"></i><span data-t="soon"></span></span></span>
   </div>
   <div class="portrait"><div class="art" data-art="portrait"></div></div>
   <div class="copy">
-    <h1 class="title">Sắp lên sóng</h1>
+    <h1 class="title" data-t="startTitle"></h1>
     <div class="sub" data-bind="tag"></div>
     <div class="lift"><div class="plate panel">
       <div class="row">
-        <span class="lbl">Bắt đầu sau</span>
+        <span class="lbl" data-t="startsIn"></span>
         <span class="num big" id="time">05:00</span>
       </div>
       <div class="segs" id="bar"></div>
@@ -36,19 +36,18 @@
 <script src="assets/cute.js"></script>
 <script>
   const $ = id => document.getElementById(id);
-  CL.rotator($('tips'), 4200).set([
-    'Lấy ly trà sữa ngồi đợi nha',
-    'Nhớ bấm follow để nhận thông báo',
-    'Hôm nay quyết tâm leo rank'
-  ]);
+  const tips = CL.rotator($('tips'), 4200);
 
-  let start = Date.now(), target = start, total = 1, key = null;
+  let start = Date.now(), target = start, total = 1, key = null, cfgNow = null;
   CL.init(cfg => {
+    cfgNow = cfg;
+    tips.set(CL.t(cfg, 'startTips'));
     const k = cfg.min + '|' + cfg.at;
-    if (k === key) return;
-    key = k; start = Date.now();
-    target = CL.targetTime(cfg, start);
-    total = Math.max(target - start, 1000);
+    if (k !== key) {
+      key = k; start = Date.now();
+      target = CL.targetTime(cfg, start);
+      total = Math.max(target - start, 1000);
+    }
     tick();
   });
 
@@ -56,7 +55,7 @@
     const left = target - Date.now(), t = $('time');
     const done = left <= 0;
     t.classList.toggle('go', done);
-    t.innerHTML = done ? 'Lên sóng!' : CL.digits(CL.fmt(left));
+    t.innerHTML = done ? CL.esc(CL.t(cfgNow, 'goLive')) : CL.digits(CL.fmt(left));
     CL.segs($('bar'), done ? 1 : 1 - left / total, 24);
   }
   setInterval(tick, 250);

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Thông báo</title>
+<title>Alerts</title>
 <link rel="stylesheet" href="assets/cute.css">
 <style>
   /* Băng thông báo trượt vào từ trái như killfeed, linh vật / quà trồi ra khỏi ô màu */
@@ -30,15 +30,10 @@
 </div></div>
 <script src="assets/cute.js"></script>
 <script>
-  const KINDS = {
-    follow: { k: 'Follow mới',   t: () => 'vừa follow kênh. Cảm ơn nha!' },
-    gift:   { k: 'Quà tặng',     t: e => `tặng ${e.count || 1}× ${e.gift || 'Hoa hồng'}` },
-    like:   { k: 'Thả tim',      t: e => `thả ${e.count || 10} tim cho live` },
-    share:  { k: 'Chia sẻ',      t: () => 'vừa share live. Thương ghê' },
-    sub:    { k: 'Hội viên mới', t: () => 'đăng ký hội viên của kênh' }
-  };
-  const NAMES = ['Bánh Bao', 'Mochi', 'Trà Sữa', 'Mèo Mun', 'Bé Na', 'Kem Dâu', 'Su Kem', 'Cún Con', 'Bông Gòn'];
-  const GIFTS = ['Hoa hồng', 'Kẹo bông', 'Gấu bông', 'Vương miện', 'Pháo hoa'];
+  // Mỗi loại alert lấy tiêu đề (…K) và câu (…T) theo ngôn ngữ đang chọn
+  const KINDS = { follow: 'follow', gift: 'gift', like: 'like', share: 'share', sub: 'sub' };
+  const NAMES = ['Mochi', 'Bánh Bao', 'Kem Dâu', 'Lily', 'Momo', '小雪', '糖糖', 'Su Kem', 'Kiko'];
+  const GIFTS = ['Rose', 'Galaxy', 'Doughnut', 'Corgi', 'Heart Me'];
   const st = CL.init();
   const wrap = document.getElementById('wrap');
   const queue = [];
@@ -61,9 +56,10 @@
     el.className = 'alert lift';
     el.innerHTML = `<div class="ico">${CL.artHTML(st.cfg, st.theme, 'icon')}</div>` +
       '<div class="plate"><div class="k"></div><div class="u"></div><div class="t"></div></div>';
-    el.querySelector('.k').textContent = kind.k;
-    el.querySelector('.u').textContent = ev.user || 'Ai đó';
-    el.querySelector('.t').textContent = ev.text || kind.t(ev);
+    const c = st.cfg;
+    el.querySelector('.k').textContent = CL.t(c, kind + 'K');
+    el.querySelector('.u').textContent = ev.user || CL.t(c, 'someone');
+    el.querySelector('.t').textContent = ev.text || CL.t(c, kind + 'T', { count: ev.count || (ev.type === 'like' ? 10 : 1), gift: ev.gift || CL.t(c, 'defaultGift') });
     wrap.appendChild(el);
     if (!(ev.demo && CL.q.mute)) chime(ev.type);
     setTimeout(() => {

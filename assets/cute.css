@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Saira+Extra+Condensed:wght@700;800&family=Saira:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Saira+Extra+Condensed:wght@700;800&family=Saira:wght@400;500;600;700&family=ZCOOL+QingKe+HuangYou&family=Noto+Sans+SC:wght@500;700;900&display=swap');
 
 /* Bố cục: HUD game bản pastel. Khối đặc góc vuông, vát một góc, sọc màu game trên đầu,
    nhãn nghiêng như nút trong game, thanh tiến độ chia vạch. Điểm nhấn duy nhất: linh vật 3D
@@ -9,8 +9,9 @@
   --bone: var(--bg1);
   --mute: rgba(42, 21, 32, .62);
   --line: rgba(42, 21, 32, .16);
-  --fd: 'Saira Extra Condensed', 'Arial Narrow', 'Segoe UI', sans-serif;
-  --fb: 'Saira', 'Segoe UI', system-ui, sans-serif;
+  /* Saira không có chữ Hán: trình duyệt tự lấy ZCOOL QingKe HuangYou (tiêu đề) / Noto Sans SC (nội dung) cho chữ Trung */
+  --fd: 'Saira Extra Condensed', 'ZCOOL QingKe HuangYou', 'Noto Sans SC', 'Arial Narrow', 'Microsoft YaHei', sans-serif;
+  --fb: 'Saira', 'Noto Sans SC', 'Segoe UI', 'Microsoft YaHei', system-ui, sans-serif;
   --cut: 28px;
   --ease: cubic-bezier(.85, 0, .15, 1);
   --safe: 64px;

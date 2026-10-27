@@ -84,134 +84,286 @@
     .hub-head { padding: 20px 16px 16px; }
     .side { position: static; max-height: none; overflow: visible; }
   }
-</style>
-</head>
+  .head-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .seg.langs { grid-template-columns: repeat(3, auto); }
+  .langs button { padding: 8px 12px; font-size: 13px; }
+  :lang(zh) .brand h1, :lang(zh) .sec h2 { letter-spacing: 0; }
+</style></head>
 <body class="hub">
 <header class="hub-head">
   <div class="brand">
     <div>
       <h1>Cute Live Kit</h1>
-      <p>Chọn game, chỉnh chữ, rồi copy link từng màn dán vào OBS hoặc TikTok LIVE Studio.</p>
+      <p data-i="tagline"></p>
     </div>
   </div>
-  <button class="btn soft" id="copyDock"><span>Copy link bảng điều khiển</span></button>
+  <div class="head-acts">
+    <div class="seg langs" id="uilang" aria-label="Language"><button data-v="vi">Tiếng Việt</button><button data-v="en">English</button><button data-v="zh">中文</button></div>
+    <button class="btn soft" id="copyDock"><span data-i="copyDock"></span></button>
+  </div>
 </header>
 
 <div class="hub-main">
   <aside class="side">
     <section class="sec">
-      <h2>Game</h2>
+      <h2 data-i="game"></h2>
       <div class="games" id="games"></div>
-      <label class="f">Tên game tự đặt (tùy chọn)<input id="gamename" placeholder="Để trống thì dùng logo game"></label>
+      <label class="f"><span data-i="gamename"></span><input id="gamename" data-ip="gamenamePh"></label>
     </section>
 
     <section class="sec">
-      <h2>Nhân vật</h2>
+      <h2 data-i="character"></h2>
       <p class="hint" id="charhint"></p>
-      <label class="f" id="charqWrap">Tìm tướng<input id="charq" placeholder="VD: Ahri, Lux, Yuumi"></label>
+      <label class="f" id="charqWrap"><span data-i="searchChamp"></span><input id="charq" data-ip="searchPh"></label>
       <div class="chars" id="chars"></div>
     </section>
 
     <section class="sec">
-      <h2>Kênh</h2>
-      <label class="f">Tên hiển thị<input id="name" maxlength="28"></label>
-      <label class="f">TikTok ID (không cần @)<input id="handle" maxlength="30"></label>
-      <label class="f">Rank<input id="rank" placeholder="VD: Bạch Kim 2. Để trống thì ẩn"></label>
-      <label class="f">Câu giới thiệu<input id="msg" placeholder="Để trống thì dùng câu theo game"></label>
+      <h2 data-i="channel"></h2>
+      <label class="f"><span data-i="overlayLang"></span><select id="lang"><option value="vi">Tiếng Việt</option><option value="en">English</option><option value="zh">中文</option></select></label>
+      <label class="f"><span data-i="name"></span><input id="name" maxlength="28"></label>
+      <label class="f"><span data-i="handle"></span><input id="handle" maxlength="30"></label>
+      <label class="f"><span data-i="rank"></span><input id="rank" data-ip="rankPh"></label>
+      <label class="f"><span data-i="intro"></span><input id="msg" data-ip="introPh"></label>
     </section>
 
     <section class="sec">
-      <h2>Bố cục</h2>
-      <div class="seg" id="layout"><button data-v="v">Dọc 9:16 (TikTok)</button><button data-v="h">Ngang 16:9</button></div>
+      <h2 data-i="layout"></h2>
+      <div class="seg" id="layout"><button data-v="v" data-i="vertical"></button><button data-v="h" data-i="horizontal"></button></div>
       <div class="two">
-        <label class="f">Khung cam<select id="cam"><option value="tr">Góc phải</option><option value="tl">Góc trái</option><option value="off">Ẩn</option></select></label>
-        <label class="f">Tỉ lệ cam<select id="camshape"><option value="sq">Vuông 1:1</option><option value="43">4:3</option><option value="169">16:9</option></select></label>
+        <label class="f"><span data-i="camFrame"></span><select id="cam"><option value="tr" data-i="camRight"></option><option value="tl" data-i="camLeft"></option><option value="off" data-i="camHide"></option></select></label>
+        <label class="f"><span data-i="camRatio"></span><select id="camshape"><option value="sq" data-i="square"></option><option value="43">4:3</option><option value="169">16:9</option></select></label>
       </div>
-      <label class="f">Cỡ khung cam <output id="camsizeOut"></output><input type="range" id="camsize" min="240" max="620" step="10"></label>
-      <label class="chk"><input type="checkbox" id="ticker"> Hiện dải chữ chạy</label>
+      <label class="f"><span><span data-i="camSize"></span> <output id="camsizeOut"></output></span><input type="range" id="camsize" min="240" max="620" step="10"></label>
+      <label class="chk"><input type="checkbox" id="ticker"> <span data-i="showTicker"></span></label>
     </section>
 
     <section class="sec">
-      <h2>Đếm ngược</h2>
+      <h2 data-i="countdown"></h2>
       <div class="two">
-        <label class="f">Số phút<input id="min" type="number" min="0" step="1"></label>
-        <label class="f">Hoặc giờ cố định<input id="at" type="time"></label>
+        <label class="f"><span data-i="minutes"></span><input id="min" type="number" min="0" step="1"></label>
+        <label class="f"><span data-i="orTime"></span><input id="at" type="time"></label>
       </div>
-      <p class="hint">Có giờ cố định thì dùng giờ đó. Xóa giờ để dùng số phút.</p>
+      <p class="hint" data-i="countdownHint"></p>
     </section>
 
     <section class="sec">
-      <h2>Mục tiêu follow</h2>
+      <h2 data-i="goalSec"></h2>
       <div class="two">
-        <label class="f">Hiện có<input id="cur" type="number" min="0"></label>
-        <label class="f">Mục tiêu<input id="goal" type="number" min="1"></label>
+        <label class="f"><span data-i="current"></span><input id="cur" type="number" min="0"></label>
+        <label class="f"><span data-i="target"></span><input id="goal" type="number" min="1"></label>
       </div>
       <div class="steps"><button class="btn soft" data-step="-1"><span>−1</span></button><button class="btn" data-step="1"><span>+1</span></button><button class="btn" data-step="10"><span>+10</span></button></div>
     </section>
 
     <section class="sec">
-      <h2>Lời nhắn</h2>
-      <label class="f">Dải chữ chạy, mỗi dòng một câu<textarea id="msgs"></textarea></label>
-      <p class="hint">Viết <code>{handle}</code> để chèn TikTok ID. Để trống thì dùng câu mặc định.</p>
-      <label class="f">Live tiếp theo (màn Kết thúc và Ảnh bìa)<input id="next"></label>
+      <h2 data-i="messages"></h2>
+      <label class="f"><span data-i="tickerLines"></span><textarea id="msgs"></textarea></label>
+      <p class="hint" data-ih="tickerHint"></p>
+      <label class="f"><span data-i="nextLive"></span><input id="next"></label>
     </section>
 
     <section class="sec">
-      <h2>Màu và âm thanh</h2>
-      <div class="colorrow"><input type="color" id="color"><span style="flex:1;font-size:14px">Màu chính</span><button class="btn soft" id="colorReset"><span>Theo game</span></button></div>
-      <label class="chk"><input type="checkbox" id="sound"> Âm thanh khi có alert</label>
-      <label class="chk"><input type="checkbox" id="ws"> Nhận follow và quà thật từ TikFinity</label>
+      <h2 data-i="colorSound"></h2>
+      <div class="colorrow"><input type="color" id="color"><span style="flex:1;font-size:14px" data-i="mainColor"></span><button class="btn soft" id="colorReset"><span data-i="byGame"></span></button></div>
+      <label class="chk"><input type="checkbox" id="sound"> <span data-i="alertSound"></span></label>
+      <label class="chk"><input type="checkbox" id="ws"> <span data-i="tikfinity"></span></label>
       <p class="hint" id="wsStatus" hidden></p>
     </section>
   </aside>
 
   <main>
     <div class="toolbar">
-      <span class="lbl">Thử alert</span>
-      <button class="btn pri" data-alert="follow"><span>Follow</span></button>
-      <button class="btn pri" data-alert="gift"><span>Quà</span></button>
-      <button class="btn pri" data-alert="like"><span>Tim</span></button>
-      <button class="btn pri" data-alert="share"><span>Share</span></button>
-      <button class="btn pri" data-alert="sub"><span>Hội viên</span></button>
+      <span class="lbl" data-i="testAlert"></span>
+      <button class="btn pri" data-alert="follow"><span data-i="aFollow"></span></button>
+      <button class="btn pri" data-alert="gift"><span data-i="aGift"></span></button>
+      <button class="btn pri" data-alert="like"><span data-i="aLike"></span></button>
+      <button class="btn pri" data-alert="share"><span data-i="aShare"></span></button>
+      <button class="btn pri" data-alert="sub"><span data-i="aSub"></span></button>
       <span class="sp"></span>
-      <label class="chk" style="margin:0"><input type="checkbox" id="guides"> Hiện vùng TikTok che</label>
+      <label class="chk" style="margin:0"><input type="checkbox" id="guides"> <span data-i="showZones"></span></label>
     </div>
     <div class="cards" id="cards"></div>
 
     <details class="guide" id="guide">
-      <summary>Cách dùng với OBS và TikTok LIVE Studio</summary>
-      <ol>
-        <li><b>OBS:</b> Sources, bấm <b>+</b>, chọn <b>Browser</b>, dán link vào ô URL. Nếu chạy bằng file trên máy thì bỏ tick <i>Local file</i>. Width và Height đặt đúng kích thước ghi dưới mỗi màn.</li>
-        <li>Mỗi màn chờ (Sắp lên sóng, Tạm vắng, Kết thúc) là một Scene riêng. Scene chơi game xếp từ dưới lên: game, webcam, Overlay in-game, Alert. Kéo webcam khớp vào khung 4 góc.</li>
-        <li><b>Chỉnh khi đang live:</b> trong OBS vào Docks, Custom Browser Docks, dán link bảng điều khiển. Sửa số follow hay bấm thử alert là overlay đổi ngay.</li>
-        <li><b>TikTok LIVE Studio:</b> thêm nguồn Link (nếu bản của bạn có) và dán link. Nếu không có, live qua OBS bằng stream key của TikTok.</li>
-        <li><b>Ảnh bìa:</b> mở màn Ảnh bìa ở cửa sổ dọc rồi chụp màn hình, hoặc trong OBS chuột phải nguồn và chọn Screenshot.</li>
-        <li><b>Alert và thanh follow tự chạy theo live thật:</b> mở app TikFinity trên máy, kết nối live và bật Event API. Mở bảng điều khiển <b>từ file trên máy</b> (file <code>index.html</code> trong folder CuteLiveKit, không dùng bản online vì trình duyệt chặn bản online nối vào máy), tick ô TikFinity, đợi dòng “Đã kết nối TikFinity”, rồi copy link Alert và In-game dán vào OBS. Tắt alert riêng của TikFinity để khỏi hiện hai lần.</li>
-        <li><b>Tách nhỏ:</b> thêm <code>&amp;only=cam</code>, <code>&amp;only=info</code> hoặc <code>&amp;only=ticker</code> vào cuối link In-game để chỉ hiện một phần.</li>
-        <li><b>Logo FC Online:</b> thả file <code>fconline.png</code> vào <code>assets/logos/</code>. Chưa có thì hiện tên chữ.</li>
-      </ol>
+      <summary data-i="guideTitle"></summary>
+      <ol id="guideList"></ol>
     </details>
-    <p class="credit">Ảnh agent Valorant qua <a href="https://valorant-api.com" target="_blank" rel="noopener">valorant-api.com</a>, ảnh tướng qua Data Dragon của Riot. Logo game thuộc về các nhà phát hành, lấy từ Wikimedia Commons.<br>Cute Live Kit isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.</p>
+    <p class="credit"><span data-ih="credit"></span><br>Cute Live Kit isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.</p>
   </main>
 </div>
 
 <script src="assets/cute.js"></script>
 <script>
+  /* Chữ giao diện bảng điều khiển: vi / en / zh. Ngôn ngữ overlay chọn riêng ở mục Kênh. */
+  const UI = {
+    vi: {
+      tagline: 'Chọn game, chỉnh chữ, rồi copy link từng màn dán vào OBS hoặc TikTok LIVE Studio.',
+      copyDock: 'Copy link bảng điều khiển', copied: 'Đã copy',
+      game: 'Game', gamename: 'Tên game tự đặt (tùy chọn)', gamenamePh: 'Để trống thì dùng logo game',
+      character: 'Nhân vật', searchChamp: 'Tìm tướng', searchPh: 'VD: Ahri, Lux, Yuumi',
+      hintValo: 'Agent Valorant, ảnh lấy từ trong game.', hintLol: 'Tướng Liên Minh, ảnh từ Data Dragon của Riot.',
+      hintNone: 'Game này chưa có kho ảnh nhân vật công khai, overlay dùng logo game làm hình chính.',
+      loadingChamps: 'Đang tải danh sách tướng…', loadFail: 'Không tải được danh sách tướng. Kiểm tra mạng rồi tải lại trang.',
+      channel: 'Kênh', overlayLang: 'Ngôn ngữ trên overlay', name: 'Tên hiển thị', handle: 'TikTok ID (không cần @)',
+      rank: 'Rank', rankPh: 'VD: Bạch Kim 2. Để trống thì ẩn', intro: 'Câu giới thiệu', introPh: 'Để trống thì dùng câu theo game',
+      layout: 'Bố cục', vertical: 'Dọc 9:16 (TikTok)', horizontal: 'Ngang 16:9',
+      camFrame: 'Khung cam', camRight: 'Góc phải', camLeft: 'Góc trái', camHide: 'Ẩn', camRatio: 'Tỉ lệ cam', square: 'Vuông 1:1',
+      camSize: 'Cỡ khung cam', showTicker: 'Hiện dải chữ chạy',
+      countdown: 'Đếm ngược', minutes: 'Số phút', orTime: 'Hoặc giờ cố định', countdownHint: 'Có giờ cố định thì dùng giờ đó. Xóa giờ để dùng số phút.',
+      goalSec: 'Mục tiêu follow', current: 'Hiện có', target: 'Mục tiêu',
+      messages: 'Lời nhắn', tickerLines: 'Dải chữ chạy, mỗi dòng một câu',
+      tickerHint: 'Viết <code>{handle}</code> để chèn TikTok ID. Để trống thì dùng câu mặc định theo ngôn ngữ overlay.',
+      nextLive: 'Live tiếp theo (màn Kết thúc và Ảnh bìa)',
+      colorSound: 'Màu và âm thanh', mainColor: 'Màu chính', byGame: 'Theo game', alertSound: 'Âm thanh khi có alert',
+      tikfinity: 'Nhận follow và quà thật từ TikFinity',
+      wsOk: 'Đã kết nối TikFinity. Follow và quà thật sẽ tự hiện alert.',
+      wsOnline: 'Bản online bị trình duyệt chặn nối vào TikFinity. Mở file index.html trong folder CuteLiveKit trên máy rồi copy link từ đó.',
+      wsMissing: 'Chưa thấy TikFinity. Mở app TikFinity trên máy này, kết nối live và bật Event API (cổng 21213).',
+      testAlert: 'Thử alert', aFollow: 'Follow', aGift: 'Quà', aLike: 'Tim', aShare: 'Share', aSub: 'Hội viên', showZones: 'Hiện vùng TikTok che',
+      copyLink: 'Copy link', open: 'Mở', solid: 'nền đầy đủ', transparent: 'nền trong suốt',
+      sStart: 'Sắp lên sóng', dStart: 'Màn chờ có đếm ngược.', sIngame: 'Overlay in-game', dIngame: 'Thẻ người chơi, khung cam, mục tiêu follow, chữ chạy.',
+      sAlert: 'Alert', dAlert: 'Follow, quà, tim, share, hội viên. Bản xem trước tự chạy thử.', sBrb: 'Tạm vắng', dBrb: 'Đồng hồ đếm thời gian vắng.',
+      sEnd: 'Kết thúc', dEnd: 'Lời cảm ơn và lịch live tiếp theo.', sCover: 'Ảnh bìa', dCover: 'Chụp màn hình làm ảnh bìa live.',
+      credit: 'Ảnh agent Valorant qua <a href="https://valorant-api.com" target="_blank" rel="noopener">valorant-api.com</a>, ảnh tướng qua Data Dragon của Riot. Logo game thuộc về các nhà phát hành, lấy từ Wikimedia Commons.',
+      guideTitle: 'Cách dùng với OBS và TikTok LIVE Studio',
+      guide: [
+        '<b>OBS:</b> Sources, bấm <b>+</b>, chọn <b>Browser</b>, dán link vào ô URL. Nếu chạy bằng file trên máy thì bỏ tick <i>Local file</i>. Width và Height đặt đúng kích thước ghi dưới mỗi màn.',
+        'Mỗi màn chờ (Sắp lên sóng, Tạm vắng, Kết thúc) là một Scene riêng. Scene chơi game xếp từ dưới lên: game, webcam, Overlay in-game, Alert. Kéo webcam khớp vào khung 4 góc.',
+        '<b>Chỉnh khi đang live:</b> trong OBS vào Docks, Custom Browser Docks, dán link bảng điều khiển. Sửa số follow hay bấm thử alert là overlay đổi ngay.',
+        '<b>TikTok LIVE Studio:</b> dựng mọi thứ trong OBS, bấm Start Virtual Camera, rồi trong TikTok LIVE Studio thêm nguồn Camera và chọn OBS Virtual Camera. Thêm trực tiếp bằng nguồn Link cũng được nhưng hay bị lỗi khung nhỏ.',
+        '<b>Ảnh bìa:</b> mở màn Ảnh bìa ở cửa sổ dọc rồi chụp màn hình, hoặc trong OBS chuột phải nguồn và chọn Screenshot.',
+        '<b>Alert và thanh follow tự chạy theo live thật:</b> mở app TikFinity, kết nối live và bật Event API. Mở bảng điều khiển <b>từ file trên máy</b> (<code>index.html</code> trong folder CuteLiveKit), tick ô TikFinity, đợi dòng “Đã kết nối TikFinity”, rồi copy link Alert và In-game. Tắt alert riêng của TikFinity để khỏi hiện hai lần.',
+        '<b>Tách nhỏ:</b> thêm <code>&amp;only=cam</code>, <code>&amp;only=info</code> hoặc <code>&amp;only=ticker</code> vào cuối link In-game để chỉ hiện một phần.'
+      ]
+    },
+    en: {
+      tagline: 'Pick a game, edit the text, then copy each scene link into OBS or TikTok LIVE Studio.',
+      copyDock: 'Copy control panel link', copied: 'Copied',
+      game: 'Game', gamename: 'Custom game name (optional)', gamenamePh: 'Leave empty to use the game logo',
+      character: 'Character', searchChamp: 'Search champions', searchPh: 'e.g. Ahri, Lux, Yuumi',
+      hintValo: 'Valorant agents, art taken from the game.', hintLol: 'League champions, art from Riot Data Dragon.',
+      hintNone: 'This game has no public character art, so the overlay uses the game logo instead.',
+      loadingChamps: 'Loading champions…', loadFail: 'Could not load the champion list. Check your connection and reload.',
+      channel: 'Channel', overlayLang: 'Overlay language', name: 'Display name', handle: 'TikTok ID (without @)',
+      rank: 'Rank', rankPh: 'e.g. Platinum 2. Leave empty to hide', intro: 'Tagline', introPh: 'Leave empty to use the game tagline',
+      layout: 'Layout', vertical: 'Vertical 9:16 (TikTok)', horizontal: 'Horizontal 16:9',
+      camFrame: 'Camera frame', camRight: 'Right corner', camLeft: 'Left corner', camHide: 'Hidden', camRatio: 'Camera ratio', square: 'Square 1:1',
+      camSize: 'Camera size', showTicker: 'Show scrolling messages',
+      countdown: 'Countdown', minutes: 'Minutes', orTime: 'Or a fixed time', countdownHint: 'A fixed time overrides minutes. Clear the time to use minutes.',
+      goalSec: 'Follower goal', current: 'Current', target: 'Goal',
+      messages: 'Messages', tickerLines: 'Scrolling messages, one per line',
+      tickerHint: 'Write <code>{handle}</code> to insert your TikTok ID. Leave empty for default lines in the overlay language.',
+      nextLive: 'Next stream (Ending and Cover scenes)',
+      colorSound: 'Color and sound', mainColor: 'Main color', byGame: 'Match game', alertSound: 'Play sound on alerts',
+      tikfinity: 'Receive real follows and gifts from TikFinity',
+      wsOk: 'Connected to TikFinity. Real follows and gifts will trigger alerts.',
+      wsOnline: 'The browser blocks the online version from reaching TikFinity. Open index.html from the CuteLiveKit folder on this PC and copy links from there.',
+      wsMissing: 'TikFinity not found. Open the TikFinity app on this PC, connect your LIVE and enable the Event API (port 21213).',
+      testAlert: 'Test alerts', aFollow: 'Follow', aGift: 'Gift', aLike: 'Likes', aShare: 'Share', aSub: 'Subscriber', showZones: 'Show TikTok UI areas',
+      copyLink: 'Copy link', open: 'Open', solid: 'full background', transparent: 'transparent background',
+      sStart: 'Starting soon', dStart: 'Waiting screen with countdown.', sIngame: 'In-game overlay', dIngame: 'Player card, camera frame, follower goal, scrolling text.',
+      sAlert: 'Alerts', dAlert: 'Follows, gifts, likes, shares, subscribers. The preview plays a demo.', sBrb: 'Be right back', dBrb: 'Timer showing how long you have been away.',
+      sEnd: 'Ending', dEnd: 'Thank-you screen with the next stream time.', sCover: 'Cover', dCover: 'Screenshot it for your LIVE cover.',
+      credit: 'Valorant agent art via <a href="https://valorant-api.com" target="_blank" rel="noopener">valorant-api.com</a>, champion art via Riot Data Dragon. Game logos belong to their publishers, sourced from Wikimedia Commons.',
+      guideTitle: 'How to use with OBS and TikTok LIVE Studio',
+      guide: [
+        '<b>OBS:</b> Sources, click <b>+</b>, choose <b>Browser</b>, paste the link into URL. For local files, untick <i>Local file</i>. Set Width and Height to the size shown under each scene.',
+        'Each waiting scene (Starting soon, Be right back, Ending) is its own Scene. Gameplay scene, bottom to top: game, webcam, In-game overlay, Alerts. Fit the webcam inside the 4 corner brackets.',
+        '<b>Edit while live:</b> in OBS open Docks, Custom Browser Docks, and paste the control panel link. Changes and test alerts update the overlay instantly.',
+        '<b>TikTok LIVE Studio:</b> build everything in OBS, click Start Virtual Camera, then in TikTok LIVE Studio add a Camera source and pick OBS Virtual Camera. Adding a Link source directly also works but often shows a tiny frame.',
+        '<b>Cover:</b> open the Cover scene in a vertical window and take a screenshot, or right-click the source in OBS and choose Screenshot.',
+        '<b>Alerts and follower goal from your real LIVE:</b> open TikFinity, connect your LIVE and enable the Event API. Open the control panel <b>from the local file</b> (<code>index.html</code> in the CuteLiveKit folder), tick TikFinity, wait for “Connected to TikFinity”, then copy the Alerts and In-game links. Turn off TikFinity’s own alerts to avoid duplicates.',
+        '<b>Split parts:</b> add <code>&amp;only=cam</code>, <code>&amp;only=info</code> or <code>&amp;only=ticker</code> to the In-game link to show just one part.'
+      ]
+    },
+    zh: {
+      tagline: '选择游戏、修改文字，然后复制每个画面的链接，粘贴到 OBS 或 TikTok LIVE Studio。',
+      copyDock: '复制控制面板链接', copied: '已复制',
+      game: '游戏', gamename: '自定义游戏名（可选）', gamenamePh: '留空则使用游戏 Logo',
+      character: '角色', searchChamp: '搜索英雄', searchPh: '例如：阿狸、拉克丝、悠米',
+      hintValo: '无畏契约特工，图片来自游戏。', hintLol: '英雄联盟英雄，图片来自 Riot Data Dragon。',
+      hintNone: '这个游戏没有公开的角色图片，叠加层会用游戏 Logo 作为主图。',
+      loadingChamps: '正在加载英雄列表…', loadFail: '英雄列表加载失败，请检查网络后刷新页面。',
+      channel: '频道', overlayLang: '叠加层语言', name: '显示名称', handle: 'TikTok ID（不用加 @）',
+      rank: '段位', rankPh: '例如：铂金 2。留空则隐藏', intro: '简介', introPh: '留空则使用游戏默认文案',
+      layout: '布局', vertical: '竖屏 9:16（TikTok）', horizontal: '横屏 16:9',
+      camFrame: '摄像头框', camRight: '右上角', camLeft: '左上角', camHide: '隐藏', camRatio: '摄像头比例', square: '正方形 1:1',
+      camSize: '摄像头框大小', showTicker: '显示滚动文字',
+      countdown: '倒计时', minutes: '分钟数', orTime: '或固定时间', countdownHint: '设置了固定时间就按时间倒数，清空时间则按分钟数。',
+      goalSec: '关注目标', current: '当前', target: '目标',
+      messages: '滚动文字', tickerLines: '滚动文字，每行一句',
+      tickerHint: '输入 <code>{handle}</code> 可插入你的 TikTok ID。留空则使用叠加层语言的默认文案。',
+      nextLive: '下次直播（结束画面和封面）',
+      colorSound: '颜色和声音', mainColor: '主色', byGame: '跟随游戏', alertSound: '提醒时播放声音',
+      tikfinity: '从 TikFinity 接收真实关注和礼物',
+      wsOk: '已连接 TikFinity，真实的关注和礼物会自动弹出提醒。',
+      wsOnline: '浏览器禁止在线版连接 TikFinity。请在电脑上打开 CuteLiveKit 文件夹里的 index.html，再从那里复制链接。',
+      wsMissing: '没有找到 TikFinity。请在这台电脑上打开 TikFinity，连接直播并开启 Event API（端口 21213）。',
+      testAlert: '测试提醒', aFollow: '关注', aGift: '礼物', aLike: '点赞', aShare: '分享', aSub: '订阅', showZones: '显示 TikTok 遮挡区域',
+      copyLink: '复制链接', open: '打开', solid: '完整背景', transparent: '透明背景',
+      sStart: '即将开播', dStart: '带倒计时的等待画面。', sIngame: '游戏叠加层', dIngame: '主播卡片、摄像头框、关注目标、滚动文字。',
+      sAlert: '提醒', dAlert: '关注、礼物、点赞、分享、订阅。预览会自动演示。', sBrb: '马上回来', dBrb: '显示离开了多久的计时器。',
+      sEnd: '直播结束', dEnd: '感谢画面和下次直播时间。', sCover: '封面', dCover: '截图作为直播封面。',
+      credit: '无畏契约特工图片来自 <a href="https://valorant-api.com" target="_blank" rel="noopener">valorant-api.com</a>，英雄图片来自 Riot Data Dragon。游戏 Logo 归各发行商所有，来源 Wikimedia Commons。',
+      guideTitle: '在 OBS 和 TikTok LIVE Studio 中使用',
+      guide: [
+        '<b>OBS：</b>来源，点 <b>+</b>，选择<b>浏览器</b>，把链接粘贴到 URL。使用本地文件时取消勾选<i>本地文件</i>。宽高按每个画面下方标注的尺寸设置。',
+        '每个等待画面（即将开播、马上回来、直播结束）各建一个场景。游戏场景从下到上：游戏、摄像头、游戏叠加层、提醒。把摄像头对准四个角框。',
+        '<b>直播中修改：</b>在 OBS 的停靠窗口里添加自定义浏览器停靠，粘贴控制面板链接。修改内容或测试提醒，叠加层会立即更新。',
+        '<b>TikTok LIVE Studio：</b>在 OBS 里搭好画面，点击“启动虚拟摄像机”，然后在 TikTok LIVE Studio 添加“摄像头”来源，选择 OBS Virtual Camera。也可以直接添加“链接”来源，但经常出现画面很小的问题。',
+        '<b>封面：</b>用竖屏窗口打开封面画面再截图，或在 OBS 里右键来源选择截图。',
+        '<b>跟随真实直播的提醒和关注目标：</b>打开 TikFinity，连接直播并开启 Event API。<b>从电脑上的文件</b>打开控制面板（CuteLiveKit 文件夹里的 <code>index.html</code>），勾选 TikFinity，等出现“已连接 TikFinity”，再复制提醒和游戏叠加层的链接。关闭 TikFinity 自带的提醒，避免重复。',
+        '<b>拆分显示：</b>在游戏叠加层链接末尾加上 <code>&amp;only=cam</code>、<code>&amp;only=info</code> 或 <code>&amp;only=ticker</code>，只显示其中一部分。'
+      ]
+    }
+  };
+  const DD_LOCALE = { vi: 'vi_VN', en: 'en_US', zh: 'zh_CN' };
+
   const $ = s => document.querySelector(s);
   const SCENES = [
-    { f: 'starting.html', t: 'Sắp lên sóng', d: 'Màn chờ có đếm ngược.', solid: true },
-    { f: 'ingame.html', t: 'Overlay in-game', d: 'Thẻ người chơi, khung cam, mục tiêu follow, chữ chạy.' },
-    { f: 'alerts.html', t: 'Alert', d: 'Follow, quà, tim, share, hội viên. Bản xem trước tự chạy thử.' },
-    { f: 'brb.html', t: 'Tạm vắng', d: 'Đồng hồ đếm thời gian vắng.', solid: true },
-    { f: 'ending.html', t: 'Kết thúc', d: 'Lời cảm ơn và lịch live tiếp theo.', solid: true },
-    { f: 'cover.html', t: 'Ảnh bìa', d: 'Chụp màn hình làm ảnh bìa live.', solid: true }
+    { f: 'starting.html', t: 'sStart', d: 'dStart', solid: true },
+    { f: 'ingame.html', t: 'sIngame', d: 'dIngame' },
+    { f: 'alerts.html', t: 'sAlert', d: 'dAlert' },
+    { f: 'brb.html', t: 'sBrb', d: 'dBrb', solid: true },
+    { f: 'ending.html', t: 'sEnd', d: 'dEnd', solid: true },
+    { f: 'cover.html', t: 'sCover', d: 'dCover', solid: true }
   ];
   const TIKFINITY = 'ws://localhost:21213/';
-  const NAMES = ['Bánh Bao', 'Mochi', 'Trà Sữa', 'Mèo Mun', 'Kem Dâu', 'Su Kem'];
+  const NAMES = ['Mochi', 'Bánh Bao', 'Lily', 'Momo', '小雪', '糖糖'];
+  const GIFTS = ['Rose', 'Galaxy', 'Corgi'];
   let cfg = CL.readCfg();
   let hub = {};
   try { hub = JSON.parse(localStorage.getItem('cuteLive.hub') || '{}') || {}; } catch (e) { /* bỏ qua */ }
+  if (!UI[hub.ui]) { const nl = (navigator.language || '').toLowerCase(); hub.ui = nl.startsWith('zh') ? 'zh' : nl.startsWith('vi') ? 'vi' : 'en'; }
+  const L = key => (UI[hub.ui][key] != null ? UI[hub.ui][key] : UI.vi[key]);
+  const saveHub = () => { try { localStorage.setItem('cuteLive.hub', JSON.stringify(hub)); } catch (e) { /* bỏ qua */ } };
   const frames = [];
+  let wsOk = false;
+
+  // Đổi chữ giao diện theo ngôn ngữ đang chọn
+  function applyUI() {
+    document.documentElement.lang = hub.ui === 'zh' ? 'zh-CN' : hub.ui;
+    document.querySelectorAll('[data-i]').forEach(el => { el.textContent = L(el.dataset.i); });
+    document.querySelectorAll('[data-ih]').forEach(el => { el.innerHTML = L(el.dataset.ih); });
+    document.querySelectorAll('[data-ip]').forEach(el => { el.placeholder = L(el.dataset.ip); });
+    $('#guideList').innerHTML = L('guide').map(s => `<li>${s}</li>`).join('');
+    document.querySelectorAll('#uilang button').forEach(b => b.classList.toggle('on', b.dataset.v === hub.ui));
+    document.querySelectorAll('.sc').forEach(el => {
+      const s = SCENES[+el.dataset.scene];
+      el.querySelector('h3').textContent = L(s.t);
+      el.querySelector('.desc').textContent = L(s.d);
+      el.querySelector('.bg-kind').textContent = L(s.solid ? 'solid' : 'transparent');
+      el.querySelector('.copy span').textContent = L('copyLink');
+      el.querySelector('.open span').textContent = L('open');
+    });
+    const chat = document.querySelector('.gtile[data-game=chill] .gt');
+    if (chat) chat.textContent = { vi: 'Trò chuyện', en: 'Just Chatting', zh: '聊天' }[hub.ui];
+    showWs();
+    champs = null;
+    renderChars();
+  }
+  document.querySelectorAll('#uilang button').forEach(b => { b.onclick = () => { hub.ui = b.dataset.v; saveHub(); applyUI(); }; });
 
   Object.entries(CL.THEMES).forEach(([id, t]) => {
     const b = document.createElement('button');
@@ -227,30 +379,31 @@
   let champs = null, charGame = null;
   function loadChamps() {
     const get = (v, loc) => fetch(`${CL.DD}${v}/data/${loc}/champion.json`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+    const loc = DD_LOCALE[hub.ui];
     return CL.loadLolVer()
-      .then(v => get(v, 'vi_VN').catch(() => get(v, 'en_US')))
-      .then(d => { champs = Object.values(d.data).map(c => [c.name, c.id]).sort((a, b) => a[0].localeCompare(b[0], 'vi')); });
+      .then(v => get(v, loc).catch(() => get(v, 'en_US')))
+      .then(d => { champs = Object.values(d.data).map(c => [c.name, c.id]).sort((a, b) => a[0].localeCompare(b[0], hub.ui)); });
   }
   function renderChars() {
     const box = $('#chars'), g = cfg.game;
     charGame = g;
     $('#charqWrap').hidden = !(g === 'lol' || g === 'tft');
     if (g === 'valorant') {
-      $('#charhint').textContent = 'Agent Valorant, ảnh lấy từ trong game.';
+      $('#charhint').textContent = L('hintValo');
       box.innerHTML = CL.VALO_AGENTS.map(([n, id]) => `<button class="ctile" data-char="${id}" title="${n}"><img src="${CL.VALO + id}/displayicon.png" alt="${n}"></button>`).join('');
     } else if (g === 'lol' || g === 'tft') {
-      $('#charhint').textContent = 'Tướng Liên Minh, ảnh từ Data Dragon của Riot.';
+      $('#charhint').textContent = L('hintLol');
       if (!champs) {
-        box.innerHTML = '<p class="hint">Đang tải danh sách tướng…</p>';
+        box.innerHTML = `<p class="hint">${L('loadingChamps')}</p>`;
         loadChamps().then(() => { if (charGame === g) renderChars(); })
-          .catch(() => { box.innerHTML = '<p class="hint">Không tải được danh sách tướng. Kiểm tra mạng rồi tải lại trang.</p>'; });
+          .catch(() => { box.innerHTML = `<p class="hint">${L('loadFail')}</p>`; });
         return;
       }
       const term = $('#charq').value.trim().toLowerCase();
       box.innerHTML = champs.filter(([n, id]) => !term || n.toLowerCase().includes(term) || id.toLowerCase().includes(term))
-        .map(([n, id]) => `<button class="ctile" data-char="${id}" title="${n}"><img src="${CL.DD + CL.lolVer()}/img/champion/${id}.png" alt="${n}"></button>`).join('');
+        .map(([n, id]) => `<button class="ctile" data-char="${id}" title="${CL.esc(n)}"><img src="${CL.DD + CL.lolVer()}/img/champion/${id}.png" alt="${CL.esc(n)}"></button>`).join('');
     } else {
-      $('#charhint').textContent = 'Game này chưa có kho ảnh nhân vật công khai, overlay dùng logo game làm hình chính.';
+      $('#charhint').textContent = L('hintNone');
       box.innerHTML = '';
     }
     markChars();
@@ -262,13 +415,12 @@
   $('#chars').addEventListener('click', e => { const b = e.target.closest('.ctile'); if (b) { cfg.char = b.dataset.char; changed(); } });
   $('#charq').addEventListener('input', renderChars);
 
-  ['gamename', 'name', 'handle', 'rank', 'msg', 'cam', 'camshape', 'camsize', 'min', 'at', 'cur', 'goal', 'next'].forEach(k => {
+  ['lang', 'gamename', 'name', 'handle', 'rank', 'msg', 'cam', 'camshape', 'camsize', 'min', 'at', 'cur', 'goal', 'next'].forEach(k => {
     const el = document.getElementById(k);
     el.value = cfg[k];
     el.addEventListener('input', () => { cfg[k] = k === 'handle' ? el.value.replace(/^@+/, '') : el.value; changed(); });
   });
   $('#msgs').value = cfg.msgs.split('|').filter(Boolean).join('\n');
-  $('#msgs').placeholder = CL.tickerList(Object.assign({}, cfg, { msgs: '' })).join('\n');
   $('#msgs').addEventListener('input', e => {
     cfg.msgs = e.target.value.split('\n').map(s => s.trim().replace(/\|/g, '/')).filter(Boolean).join('|');
     changed();
@@ -306,16 +458,16 @@
     }
     const label = btn.querySelector('span') || btn;
     const old = label.textContent;
-    label.textContent = 'Đã copy';
+    label.textContent = L('copied');
     setTimeout(() => { label.textContent = old; }, 1500);
   }
 
-  SCENES.forEach(s => {
+  SCENES.forEach((s, i) => {
     const el = document.createElement('article');
-    el.className = 'sc';
-    el.innerHTML = `<div class="screen ${s.solid ? '' : 'game'}"><iframe title="${s.t}"></iframe></div>` +
-      `<div><h3>${s.t}</h3><p>${s.d}</p><p class="meta"><span class="sz"></span>, ${s.solid ? 'nền đầy đủ' : 'nền trong suốt'}</p></div>` +
-      '<div class="acts"><button class="btn pri copy"><span>Copy link</span></button><button class="btn soft open"><span>Mở</span></button></div>';
+    el.className = 'sc'; el.dataset.scene = i;
+    el.innerHTML = `<div class="screen ${s.solid ? '' : 'game'}"><iframe title="${s.f}"></iframe></div>` +
+      '<div><h3></h3><p class="desc"></p><p class="meta"><span class="sz"></span>, <span class="bg-kind"></span></p></div>' +
+      '<div class="acts"><button class="btn pri copy"><span></span></button><button class="btn soft open"><span></span></button></div>';
     const fr = el.querySelector('iframe');
     fr.src = urlFor(s, true);
     frames.push(fr);
@@ -328,7 +480,7 @@
   $('#guides').checked = !!hub.guides;
   $('#guides').addEventListener('change', e => {
     hub.guides = e.target.checked;
-    try { localStorage.setItem('cuteLive.hub', JSON.stringify(hub)); } catch (err) { /* bỏ qua */ }
+    saveHub();
     frames.forEach(f => f.contentWindow && f.contentWindow.postMessage({ kind: 'guides', on: hub.guides }, '*'));
   });
 
@@ -337,31 +489,29 @@
   document.querySelectorAll('[data-alert]').forEach(b => {
     b.onclick = () => {
       const type = b.dataset.alert;
-      post(CL.send({ kind: 'alert', ev: { type, user: CL.pick(NAMES), gift: CL.pick(['Hoa hồng', 'Gấu bông', 'Vương miện']), count: type === 'like' ? 50 : 3 } }));
+      post(CL.send({ kind: 'alert', ev: { type, user: CL.pick(NAMES), gift: CL.pick(GIFTS), count: type === 'like' ? 50 : 3 } }));
     };
   });
 
-  // Trạng thái kết nối TikFinity, hiện ngay dưới ô tick
-  // Chrome chặn trang https nối vào máy (127.0.0.1), nên TikFinity chỉ chạy với bản mở từ file trên máy
+  // Trạng thái kết nối TikFinity, hiện ngay dưới ô tick.
+  // Chrome chặn trang https nối vào máy (127.0.0.1), nên TikFinity chỉ chạy với bản mở từ file trên máy.
   const ONLINE = location.protocol === 'https:';
-  CL.onTiktokStatus(ok => {
+  function showWs() {
     const el = $('#wsStatus');
     el.hidden = !cfg.ws;
-    el.style.color = ok ? 'var(--p)' : '';
-    el.textContent = ok
-      ? 'Đã kết nối TikFinity. Follow và quà thật sẽ tự hiện alert.'
-      : ONLINE
-        ? 'Bản online bị trình duyệt chặn nối vào TikFinity. Mở file index.html trong folder CuteLiveKit trên máy rồi copy link từ đó.'
-        : 'Chưa thấy TikFinity. Mở app TikFinity trên máy này, kết nối live và bật Event API (cổng 21213).';
-  });
+    el.style.color = wsOk ? 'var(--p)' : '';
+    el.textContent = L(wsOk ? 'wsOk' : ONLINE ? 'wsOnline' : 'wsMissing');
+  }
+  CL.onTiktokStatus(ok => { wsOk = ok; showWs(); });
 
   let sendTimer = null;
   function changed() {
     CL.tiktokConnect(cfg.ws);
-    if (!cfg.ws) $('#wsStatus').hidden = true;
+    showWs();
     try { localStorage.setItem('cuteLive.cfg', JSON.stringify(cfg)); } catch (e) { /* bỏ qua */ }
     const t = CL.applyTheme(cfg);
     $('#color').value = cfg.color || t.p;
+    $('#msgs').placeholder = CL.tickerList(Object.assign({}, cfg, { msgs: '' })).join('\n');
     document.querySelectorAll('.gtile').forEach(b => b.classList.toggle('on', b.dataset.game === cfg.game));
     if (charGame !== cfg.game) renderChars(); else markChars();
     document.querySelectorAll('#layout button').forEach(b => b.classList.toggle('on', b.dataset.v === cfg.layout));
@@ -371,6 +521,7 @@
     clearTimeout(sendTimer);
     sendTimer = setTimeout(() => post(CL.send({ kind: 'cfg', cfg })), 120);
   }
+  applyUI();
   changed();
 </script>
 </body>

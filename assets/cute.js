@@ -41,7 +41,7 @@
   // Ô ảnh nhân vật; game không có art thì hiện logo
   function artHTML(cfg, t, which) {
     const art = charArt(cfg);
-    if (!art) return `<span class="art-logo">${t.logo ? `<img src="${LOGO + t.logo}" alt="">` : `<b>${esc(cfg.gamename || t.label)}</b>`}</span>`;
+    if (!art) return `<span class="art-logo">${t.logo ? `<img src="${LOGO + t.logo}" alt="">` : `<b>${esc(gameLabel(cfg, t))}</b>`}</span>`;
     const src = which === 'icon' ? art.icon : art.portrait;
     return `<span class="${which === 'icon' ? 'art-icon ' : 'art-'}${art.kind}"><img src="${src}" alt="" onerror="this.parentNode.classList.add('broken');this.remove()"></span>`;
   }
@@ -52,23 +52,99 @@
   }
 
   const DEFAULTS = {
-    game: 'valorant', gamename: '', char: '', name: 'Mèo Gamer', handle: 'meogamer', rank: '', msg: '',
+    lang: 'vi', game: 'valorant', gamename: '', char: '', name: 'Mèo Gamer', handle: 'meogamer', rank: '', msg: '',
     layout: 'v', min: '5', at: '', cur: '36', goal: '100', next: '20:00 tối mai', msgs: '',
     cam: 'tr', camshape: 'sq', camsize: '380', ticker: '1', color: '', sound: '1', ws: ''
   };
 
-  const DEFAULT_MSGS = [
-    'Thả tim để mình bắn trúng đầu nha',
-    'Follow {handle} để không lỡ live nè',
-    'Tặng quà là mình múa liền',
-    'Bình luận đi, mình đọc hết á'
-  ];
+  /* Chữ trên overlay theo ngôn ngữ người xem: vi (Tiếng Việt), en (English), zh (中文 giản thể) */
+  const LANGS = { vi: 'Tiếng Việt', en: 'English', zh: '中文' };
+  const STR = {
+    vi: {
+      soon: 'Sắp live', brbTag: 'Tạm vắng', endTag: 'Hết live',
+      startTitle: 'Sắp lên sóng', startsIn: 'Bắt đầu sau', goLive: 'Lên sóng!',
+      startTips: ['Lấy ly trà sữa ngồi đợi nha', 'Nhớ bấm follow để nhận thông báo', 'Hôm nay quyết tâm leo rank'],
+      brbTitle: 'Đợi xíu nha', brbSub: 'Mình quay lại liền, đừng đi đâu nha', away: 'Đã vắng mặt',
+      brbTips: ['Tranh thủ thả tim giữ live nha', 'Ai chưa follow thì follow đi nè', 'Mình đi uống nước xíu'],
+      endTitle: 'Cảm ơn cả nhà', endSub: 'Hôm nay vui lắm luôn á. Ngủ ngon nha mọi người.', nextLive: 'Live tiếp theo',
+      followNotify: 'Follow {handle} để được báo khi lên sóng', seeYou: 'Mai gặp lại nha', schedule: 'Lịch live',
+      goal: 'Mục tiêu follow', goalDone: 'Đạt mục tiêu rồi', rank: 'Rank', someone: 'Ai đó', defaultGift: 'Hoa hồng',
+      followK: 'Follow mới', followT: 'vừa follow kênh. Cảm ơn nha!',
+      giftK: 'Quà tặng', giftT: 'tặng {count}× {gift}',
+      likeK: 'Thả tim', likeT: 'thả {count} tim cho live',
+      shareK: 'Chia sẻ', shareT: 'vừa share live. Thương ghê',
+      subK: 'Hội viên mới', subT: 'đăng ký hội viên của kênh',
+      ticker: ['Thả tim để mình bắn trúng đầu nha', 'Follow {handle} để không lỡ live nè', 'Tặng quà là mình múa liền', 'Bình luận đi, mình đọc hết á']
+    },
+    en: {
+      soon: 'Live soon', brbTag: 'Be right back', endTag: 'Stream ended',
+      startTitle: 'Starting soon', startsIn: 'Starting in', goLive: "We're live!",
+      startTips: ['Grab a bubble tea and settle in', 'Hit follow so you never miss a stream', 'Ranked grind starts today'],
+      brbTitle: 'Be right back', brbSub: "Back in a moment, don't go anywhere", away: 'Away for',
+      brbTips: ['Tap some likes to keep the stream warm', 'Not following yet? Now is a good time', 'Just grabbing some water'],
+      endTitle: 'Thanks for watching', endSub: 'Today was so much fun. Sleep well, everyone.', nextLive: 'Next stream',
+      followNotify: 'Follow {handle} to get notified when I go live', seeYou: 'See you next time', schedule: 'Stream schedule',
+      goal: 'Follower goal', goalDone: 'Goal reached', rank: 'Rank', someone: 'Someone', defaultGift: 'Rose',
+      followK: 'New follower', followT: 'just followed. Thank you!',
+      giftK: 'Gift', giftT: 'sent {count}× {gift}',
+      likeK: 'Likes', likeT: 'sent {count} likes',
+      shareK: 'Share', shareT: 'shared the stream. Love you!',
+      subK: 'New subscriber', subT: 'subscribed to the channel',
+      ticker: ['Tap likes and watch me hit headshots', 'Follow {handle} so you never miss a stream', 'Send a gift and I will dance', 'Say hi in chat, I read everything']
+    },
+    zh: {
+      soon: '即将开播', brbTag: '马上回来', endTag: '直播结束',
+      startTitle: '即将开播', startsIn: '距离开播', goLive: '开播啦！',
+      startTips: ['拿杯奶茶，坐等开播', '点个关注，开播不错过', '今天也要冲分'],
+      brbTitle: '稍等一下', brbSub: '马上回来，别走开哦', away: '已离开',
+      brbTips: ['趁现在点点赞', '还没关注的快关注', '去喝口水马上回'],
+      endTitle: '感谢观看', endSub: '今天超开心，大家晚安', nextLive: '下次直播',
+      followNotify: '关注 {handle}，开播第一时间通知你', seeYou: '下次见', schedule: '直播时间',
+      goal: '关注目标', goalDone: '目标达成', rank: '段位', someone: '有人', defaultGift: '玫瑰',
+      followK: '新关注', followT: '关注了直播间，谢谢！',
+      giftK: '礼物', giftT: '送出 {count}× {gift}',
+      likeK: '点赞', likeT: '点了 {count} 个赞',
+      shareK: '分享', shareT: '分享了直播间，爱你！',
+      subK: '新订阅', subT: '订阅了频道',
+      ticker: ['点赞助我爆头', '关注 {handle}，开播不错过', '送礼物我就跳舞', '评论区聊聊，我都会看']
+    }
+  };
+  // Câu giới thiệu và tên game (khi thiếu logo) theo ngôn ngữ
+  const TAGS = {
+    valorant:  { vi: 'Headshot bằng tình yêu',       en: 'Headshots with love',             zh: '用爱爆头' },
+    lol:       { vi: 'Gánh team bằng sự đáng yêu',   en: 'Carrying the team with cuteness', zh: '靠可爱带飞全队' },
+    tft:       { vi: 'Top 1 hay top 8 đều dễ thương', en: 'First or eighth, still cute',     zh: '吃鸡还是垫底都可爱' },
+    lienquan:  { vi: 'Leo rank cùng bé cưng',        en: 'Climbing ranked together',        zh: '一起上分吧' },
+    fconline:  { vi: 'Sút là vào, vào là vui',       en: 'Every shot is a goal',            zh: '一脚射门，快乐进球' },
+    genshin:   { vi: 'Gacha ra 5 sao nha',           en: 'Praying for a 5-star pull',       zh: '祈愿出金' },
+    minecraft: { vi: 'Đào đào, xây xây, ngủ ngon',   en: 'Dig, build, sleep tight',         zh: '挖挖挖，建建建' },
+    pubg:      { vi: 'Winner winner, gà rán dinner', en: 'Winner winner, chicken dinner',   zh: '大吉大利，今晚吃鸡' },
+    freefire:  { vi: 'Booyah dễ thương nhất server', en: 'Cutest Booyah on the server',     zh: '全服最可爱的 Booyah' },
+    roblox:    { vi: 'Obby khó cũng không sợ',       en: 'No obby too hard',                zh: '再难的关卡也不怕' },
+    chill:     { vi: 'Ngồi xuống uống trà sữa nè',   en: 'Pull up a chair and chat',        zh: '坐下来喝杯奶茶聊聊天' }
+  };
+  const LABELS = {
+    en: { tft: 'Teamfight Tactics', lienquan: 'Arena of Valor', chill: 'Just Chatting' },
+    zh: { valorant: '无畏契约', lol: '英雄联盟', tft: '云顶之弈', lienquan: '传说对决', genshin: '原神', minecraft: '我的世界', pubg: '绝地求生', freefire: '自由之火', roblox: '罗布乐思', chill: '聊天' }
+  };
+
+  const langOf = cfg => (STR[cfg && cfg.lang] ? cfg.lang : 'vi');
+  // Lấy chữ theo ngôn ngữ, thay {handle}, {count}, {gift}
+  function t(cfg, key, vars) {
+    const v = STR[langOf(cfg)][key];
+    const fill = s => String(s).replace(/\{(\w+)\}/g, (m, k) => (vars && vars[k] != null ? vars[k] : m));
+    return Array.isArray(v) ? v.map(fill) : fill(v == null ? key : v);
+  }
+  function gameLabel(cfg, th) {
+    const l = LABELS[langOf(cfg)];
+    return cfg.gamename || (l && l[cfg.game]) || th.label;
+  }
 
   const Q = Object.fromEntries(new URLSearchParams(location.search));
   const pick = arr => arr[Math.floor(Math.random() * arr.length)];
   // Logo game thật; thiếu file thì tự hiện tên chữ
   function gameBadge(cfg, t) {
-    const label = cfg.gamename || t.label;
+    const label = gameLabel(cfg, t);
     const text = `<span class="gtxt">${esc(label)}</span>`;
     if (!t.logo) return text;
     return `<img class="glogo" src="${LOGO + t.logo}" alt="${esc(label)}" style="--lh:${t.lh || 1}" onerror="this.parentNode.classList.add('nologo');this.remove()">` +
@@ -104,11 +180,15 @@
 
   function handleOf(cfg) { return '@' + String(cfg.handle || '').replace(/^@/, ''); }
 
-  function bind(cfg, t) {
-    const vals = { name: cfg.name, handle: handleOf(cfg), tag: cfg.msg || t.tag, rank: cfg.rank, next: cfg.next };
+  function bind(cfg, th) {
+    const lang = langOf(cfg);
+    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
+    const tag = TAGS[cfg.game] ? TAGS[cfg.game][lang] : '';
+    const vals = { name: cfg.name, handle: handleOf(cfg), tag: cfg.msg || tag, rank: cfg.rank, next: cfg.next };
     document.querySelectorAll('[data-bind]').forEach(el => { el.textContent = vals[el.dataset.bind] || ''; });
-    document.querySelectorAll('[data-game]').forEach(el => { el.classList.remove('nologo'); el.innerHTML = gameBadge(cfg, t); });
-    document.querySelectorAll('[data-art]').forEach(el => { el.innerHTML = artHTML(cfg, t, el.dataset.art); });
+    document.querySelectorAll('[data-t]').forEach(el => { el.textContent = t(cfg, el.dataset.t, { handle: vals.handle }); });
+    document.querySelectorAll('[data-game]').forEach(el => { el.classList.remove('nologo'); el.innerHTML = gameBadge(cfg, th); });
+    document.querySelectorAll('[data-art]').forEach(el => { el.innerHTML = artHTML(cfg, th, el.dataset.art); });
   }
 
   // Bọc từng chữ số để đồng hồ có độ rộng cố định
@@ -140,7 +220,7 @@
   }
 
   function tickerList(cfg) {
-    const list = cfg.msgs ? cfg.msgs.split('|').map(s => s.trim()).filter(Boolean) : DEFAULT_MSGS;
+    const list = cfg.msgs ? cfg.msgs.split('|').map(s => s.trim()).filter(Boolean) : STR[langOf(cfg)].ticker;
     return list.map(s => s.replace(/\{handle\}/g, handleOf(cfg)));
   }
 
@@ -201,7 +281,7 @@
     let type = String(m.event || m.type || (m.data && (m.data.event || m.data.type)) || '').toLowerCase();
     const d = (m.data && typeof m.data === 'object') ? m.data : m;
     const u = (d.user && typeof d.user === 'object') ? d.user : {};
-    const user = String(d.nickname || u.nickname || d.uniqueId || u.uniqueId || 'Ai đó');
+    const user = String(d.nickname || u.nickname || d.uniqueId || u.uniqueId || '');
     if (type === 'social') {
       const dt = String(d.displayType || d.label || '');
       type = /follow/i.test(dt) ? 'follow' : /share/i.test(dt) ? 'share' : '';
@@ -263,5 +343,5 @@
     return state;
   }
 
-  window.CL = { THEMES, DEFAULTS, LOGO, VALO, VALO_AGENTS, DD, q: Q, charArt, artHTML, loadLolVer, lolVer: () => lolVer, gameBadge, esc, digits, segs, readCfg, applyTheme, fit, rotator, tickerList, fmt, targetTime, listen, send, normalizeEvent, tiktokConnect, onTiktok, onTiktokStatus, init, pick };
+  window.CL = { THEMES, LANGS, TAGS, t, gameLabel, DEFAULTS, LOGO, VALO, VALO_AGENTS, DD, q: Q, charArt, artHTML, loadLolVer, lolVer: () => lolVer, gameBadge, esc, digits, segs, readCfg, applyTheme, fit, rotator, tickerList, fmt, targetTime, listen, send, normalizeEvent, tiktokConnect, onTiktok, onTiktokStatus, init, pick };
 })();
