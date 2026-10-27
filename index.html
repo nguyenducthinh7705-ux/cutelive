@@ -120,7 +120,6 @@
 
     <section class="sec">
       <h2 data-i="channel"></h2>
-      <label class="f"><span data-i="overlayLang"></span><select id="lang"><option value="vi">Tiếng Việt</option><option value="en">English</option><option value="zh">中文</option></select></label>
       <label class="f"><span data-i="name"></span><input id="name" maxlength="28"></label>
       <label class="f"><span data-i="handle"></span><input id="handle" maxlength="30"></label>
       <label class="f"><span data-i="rank"></span><input id="rank" data-ip="rankPh"></label>
@@ -335,7 +334,8 @@
   let cfg = CL.readCfg();
   let hub = {};
   try { hub = JSON.parse(localStorage.getItem('cuteLive.hub') || '{}') || {}; } catch (e) { /* bỏ qua */ }
-  if (!UI[hub.ui]) { const nl = (navigator.language || '').toLowerCase(); hub.ui = nl.startsWith('zh') ? 'zh' : nl.startsWith('vi') ? 'vi' : 'en'; }
+  // Một ngôn ngữ cho tất cả: giao diện bảng điều khiển, overlay, chữ chạy, lịch live
+  hub.ui = UI[cfg.lang] ? cfg.lang : 'zh';
   const L = key => (UI[hub.ui][key] != null ? UI[hub.ui][key] : UI.vi[key]);
   const saveHub = () => { try { localStorage.setItem('cuteLive.hub', JSON.stringify(hub)); } catch (e) { /* bỏ qua */ } };
   const frames = [];
@@ -363,7 +363,15 @@
     champs = null;
     renderChars();
   }
-  document.querySelectorAll('#uilang button').forEach(b => { b.onclick = () => { hub.ui = b.dataset.v; saveHub(); applyUI(); }; });
+  document.querySelectorAll('#uilang button').forEach(b => {
+    b.onclick = () => {
+      const lang = b.dataset.v;
+      if (Object.values(CL.NEXT_DEFAULT).includes(cfg.next)) { cfg.next = CL.NEXT_DEFAULT[lang]; $('#next').value = cfg.next; }
+      hub.ui = cfg.lang = lang;
+      applyUI();
+      changed();
+    };
+  });
 
   Object.entries(CL.THEMES).forEach(([id, t]) => {
     const b = document.createElement('button');
@@ -415,7 +423,7 @@
   $('#chars').addEventListener('click', e => { const b = e.target.closest('.ctile'); if (b) { cfg.char = b.dataset.char; changed(); } });
   $('#charq').addEventListener('input', renderChars);
 
-  ['lang', 'gamename', 'name', 'handle', 'rank', 'msg', 'cam', 'camshape', 'camsize', 'min', 'at', 'cur', 'goal', 'next'].forEach(k => {
+  ['gamename', 'name', 'handle', 'rank', 'msg', 'cam', 'camshape', 'camsize', 'min', 'at', 'cur', 'goal', 'next'].forEach(k => {
     const el = document.getElementById(k);
     el.value = cfg[k];
     el.addEventListener('input', () => { cfg[k] = k === 'handle' ? el.value.replace(/^@+/, '') : el.value; changed(); });

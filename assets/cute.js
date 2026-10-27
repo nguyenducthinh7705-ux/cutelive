@@ -52,13 +52,15 @@
   }
 
   const DEFAULTS = {
-    lang: 'vi', game: 'valorant', gamename: '', char: '', name: 'Mèo Gamer', handle: 'meogamer', rank: '', msg: '',
-    layout: 'v', min: '5', at: '', cur: '36', goal: '100', next: '20:00 tối mai', msgs: '',
+    lang: 'zh', game: 'valorant', gamename: '', char: 'ddd5a15c-4fbe-42fa-3789-11a55ca5ee04', name: 'MimeBao', handle: 'mimebao', rank: '', msg: '',
+    layout: 'v', min: '5', at: '', cur: '0', goal: '100', next: '明晚 20:00', msgs: '',
     cam: 'tr', camshape: 'sq', camsize: '380', ticker: '1', color: '', sound: '1', ws: ''
   };
 
   /* Chữ trên overlay theo ngôn ngữ người xem: vi (Tiếng Việt), en (English), zh (中文 giản thể) */
   const LANGS = { vi: 'Tiếng Việt', en: 'English', zh: '中文' };
+  // Lịch live mặc định theo ngôn ngữ; đổi ngôn ngữ thì đổi theo nếu chưa sửa tay
+  const NEXT_DEFAULT = { vi: '20:00 tối mai', en: 'Tomorrow 8 PM', zh: '明晚 20:00' };
   const STR = {
     vi: {
       soon: 'Sắp live', brbTag: 'Tạm vắng', endTag: 'Hết live',
@@ -343,5 +345,5 @@
     return state;
   }
 
-  window.CL = { THEMES, LANGS, TAGS, t, gameLabel, DEFAULTS, LOGO, VALO, VALO_AGENTS, DD, q: Q, charArt, artHTML, loadLolVer, lolVer: () => lolVer, gameBadge, esc, digits, segs, readCfg, applyTheme, fit, rotator, tickerList, fmt, targetTime, listen, send, normalizeEvent, tiktokConnect, onTiktok, onTiktokStatus, init, pick };
+  window.CL = { THEMES, LANGS, NEXT_DEFAULT, TAGS, t, gameLabel, DEFAULTS, LOGO, VALO, VALO_AGENTS, DD, q: Q, charArt, artHTML, loadLolVer, lolVer: () => lolVer, gameBadge, esc, digits, segs, readCfg, applyTheme, fit, rotator, tickerList, fmt, targetTime, listen, send, normalizeEvent, tiktokConnect, onTiktok, onTiktokStatus, init, pick };
 })();
